@@ -9,3 +9,4 @@ Ring Signature Javascript toolkit including Ring Signature, Linkable Ring Signat
 - [X] Ring Signature Algo
 - [ ] Linkable Ring Signature Algo
 - [ ] Traceble Ring Signature Algo
+- [ ] Threshold Ring Signature Algo
