@@ -32,8 +32,8 @@ export class RingSignature extends Scheme<BasicSignature> {
 
     // Build the Signature Message
     const cipher = this.hash.concat(raw).concat(encoded_secret)
-      .reduce((a, b) => a.add(b), new BN(0));
-    const b = new BN(Hash.sha512.digest(cipher.toArray()));
+      .map(x => x.toArray()).reduce((a, b) => a.concat(b), []);
+    const b = new BN(Hash.sha512.digest(cipher));
 
     // Initialize the first element
     c[(position + 1) % this.members] = b;
@@ -52,9 +52,10 @@ export class RingSignature extends Scheme<BasicSignature> {
       // Tn = Yn^Cn * g^Sn % p
       const xi = new BN(x2.add(x1).encodeCompressed('array'));
 
-      const ci = this.hash.concat(raw).concat(xi).reduce((a, b) => a.add(b), new BN(0));
+      const ci = this.hash.concat(raw).concat(xi)
+        .map(x => x.toArray()).reduce((a, b) => a.concat(b), []);
 
-      c[i] = new BN(Hash.sha512.digest(ci.toArray()));
+      c[i] = new BN(Hash.sha512.digest(ci));
     }
 
     // Sn = u - Cn * Xn
@@ -83,8 +84,9 @@ export class RingSignature extends Scheme<BasicSignature> {
       const a2 = this.keys[i].getPublic().mul(ci);
       const ai = new BN(a2.add(a1).encodeCompressed('array'));
   
-      const temp = this.hash.concat(raw).concat(ai).reduce((a, b) => a.add(b), new BN(0));
-      ci = new BN(Hash.sha512.digest(temp.toArray()));
+      const temp = this.hash.concat(raw).concat(ai)
+        .map(x => x.toArray()).reduce((a, b) => a.concat(b), []);
+      ci = new BN(Hash.sha512.digest(temp));
     }
 
     return signature.C === ci.toString('hex');
