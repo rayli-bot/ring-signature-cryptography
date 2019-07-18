@@ -4,7 +4,7 @@ import { expect } from 'chai';
 import { ec } from 'elliptic';
 
 describe('Ring Signature', () => {
-  const members = 20;
+  const members = 5;
 
   let ring: RingSignature;
   let pairs: ec.KeyPair[] = [];
