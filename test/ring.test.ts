@@ -40,14 +40,14 @@ describe('Ring Signature', () => {
 
   it('should verify signature', () => {
     for (let i = 0 ; i < members ; i++) {
-      console.time('sign & verify');
+      console.time('\tRing Signature : sign & verify');
       const str = pairs[0].getPrivate().toString('hex');
       // console.time('sign');
       const signature = ring.sign(message, 0, str);
       // console.timeEnd('sign');
       // console.time('verify');
       expect(ring.verify(message, signature)).true;
-      console.timeEnd('sign & verify');
+      console.timeEnd('\tRing Signature : sign & verify');
       // console.timeEnd('verify');
       expect(ring.verify(fake, signature)).false;
     }
