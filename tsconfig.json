@@ -17,6 +17,6 @@
     "types": ["node"],
     "outDir": "dist"
   },
-  "include": ["**/**/*.ts", "contracts"],
-  "exclude": ["node_modules", "example", "**/*.spec.ts"]
+  "include": ["src/**/*.ts"],
+  "exclude": ["node_modules", "example", "**/*.spec.ts", "**/*.test.ts"]
 }
