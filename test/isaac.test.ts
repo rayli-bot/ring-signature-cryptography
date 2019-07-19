@@ -1,0 +1,42 @@
+import { ISAAC } from '../src';
+import 'mocha';
+import { expect } from 'chai';
+import { ec } from 'elliptic';
+
+describe('Psuedo Random Generator - ISSAC', () => {
+
+  // Generate Test Signature for Each Member
+  const seed = "i am seed 0";
+  const fake = "i am seed 1";
+
+  it('should be the same from the same seed', () => {
+    const g1 = new ISAAC();
+    const g2 = new ISAAC();
+
+    for (let i = 0 ; i < 10 ; i++) {
+      g1.reset(); g2.reset();
+      g1.seed(seed); g2.seed(seed);
+      expect(g1.rand()).equals(g2.rand());
+    }
+  });
+
+  it('should be different from different seed', () => {
+    const g1 = new ISAAC();
+    const g2 = new ISAAC();
+
+    for (let i = 0 ; i < 10 ; i++) {
+      g1.reset(); g2.reset();
+      g1.seed(fake); g2.seed(seed);
+      expect(g1.rand()).not.equals(g2.rand());
+    }
+  });
+
+  it('benchmark random generator', () => {
+    const ite = 100000;
+    const g = new ISAAC();
+    console.time('\t100.000 runs');
+    for (let i = 0 ; i < ite ; ++i)
+      g.rand();
+    console.timeEnd('\t100.000 runs');
+  });
+});
