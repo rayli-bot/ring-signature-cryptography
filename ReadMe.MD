@@ -8,10 +8,12 @@ Ring Signature Javascript toolkit including Ring Signature, Linkable Ring Signat
 - [X] Keypair Geneartion
 - [X] Ring Signature Algo
 - [X] Linkable (Traceable) Ring Signature Algo
-- [ ] Threshold Ring Signature Algo
+- [X] Cryptographically secure pseudorandom number generator
+- [ ] EC Point Random Generator
 
 ## Future Development
 
+- [ ] Threshold Ring Signature Algo
 - [ ] Psuedo EC Point Generator
 - [ ] Lattice-based Ring Signature
 - [ ] Lattice-based Linkable Ring Signature
@@ -19,3 +21,7 @@ Ring Signature Javascript toolkit including Ring Signature, Linkable Ring Signat
 ## Mission
 
 - [ ] Lattice-based Threshold Ring Signature (based on Raptors-512)
+
+### Appendix
+
+- [Psuedo Random Generator Distribution Test](https://www.khanacademy.org/computer-programming/prng-test/5500564014432256)
