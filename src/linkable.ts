@@ -26,7 +26,7 @@ export class LinkableRingSignature extends Scheme<LinkableSignature> {
     const secret = key.getPrivate();
 
     // The Keypair should within the initiated group
-    if (!this.inGroup(key)) throw new Error('key error: not in group');
+    if (!this.inGroup(key, position)) throw new Error('key error: not in group');
 
     // Get Message
     const raw = new BN(Hash.sha512.digest(message));

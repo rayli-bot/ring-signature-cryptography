@@ -32,11 +32,16 @@ export abstract class Scheme<T extends BasicSignature> {
     }
   }
 
-  protected inGroup(key: ec.KeyPair) {
-    return this.keys.findIndex(x =>
+  protected inGroup(key: ec.KeyPair, index?: number) {
+    if (!index) return this.keys.findIndex(x =>
       x.getPublic().encodeCompressed('hex').toString('hex') ===
       key.getPublic().encodeCompressed('hex').toString('hex')
     ) > -1;
+    else {
+      if (index >= this.keys.length || index < 0) return false;
+      return this.keys[index].getPublic().encodeCompressed('hex').toString('hex') ===
+        key.getPublic().encodeCompressed('hex').toString('hex');
+    }
   }
 
   public abstract sign(message: string, position: number, keyString: string): T;

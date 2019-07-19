@@ -18,4 +18,4 @@ Ring Signature Javascript toolkit including Ring Signature, Linkable Ring Signat
 
 ## Mission
 
-- [ ] Lattice-based Threshold Ring Signature
+- [ ] Lattice-based Threshold Ring Signature (based on Raptors-512)
