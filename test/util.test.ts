@@ -5,7 +5,7 @@ import { ec } from 'elliptic';
 
 describe('Ring Signature Utility', () => {
 
-  const iterator = 100;
+  const iterator = 2000;
   const seed = "i am seed 0";
   const fake = "i am seed 1";
   const curve = new ec('ed25519');
@@ -17,7 +17,7 @@ describe('Ring Signature Utility', () => {
         .not.equals(random(curve.n as any).toString("hex"))
         .not.equals(random(curve.n as any, fake).toString('hex'));
     }
-  });
+  }).timeout(10000);
 
   it('should generate same keypair from same seed', () => {
     for (let i = 0 ; i < iterator ; i++) {
@@ -26,7 +26,7 @@ describe('Ring Signature Utility', () => {
         .not.equals(randomKeyPair(curve).inspect())
         .not.equals(randomKeyPair(curve, fake).inspect());
     }
-  });
+  }).timeout(10000);
 
   it('should generate same point from same seed', () => {
     for (let i = 0 ; i < iterator ; i++) {
@@ -35,5 +35,5 @@ describe('Ring Signature Utility', () => {
         .not.equals(randomPoint(curve).inspect())
         .not.equals(randomPoint(curve, fake).inspect());
     }
-  });
+  }).timeout(10000);
 });
