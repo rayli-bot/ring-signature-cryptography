@@ -9,12 +9,11 @@ Ring Signature Javascript toolkit including Ring Signature, Linkable Ring Signat
 - [X] Ring Signature Algo
 - [X] Linkable (Traceable) Ring Signature Algo
 - [X] Cryptographically secure pseudorandom number generator
-- [ ] EC Point Random Generator
+- [X] Psuedo EC Point Generator
 
 ## Future Development
 
 - [ ] Threshold Ring Signature Algo
-- [ ] Psuedo EC Point Generator
 - [ ] Lattice-based Ring Signature
 - [ ] Lattice-based Linkable Ring Signature
 
