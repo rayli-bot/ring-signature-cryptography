@@ -1,6 +1,6 @@
 # Ring Signature Toolkit
 
-Ring Signature Javascript toolkit including Ring Signature, Linkable Ring Signature and Traceable Ring Signature
+Ring Signature Javascript toolkit including classic Ring Signature, Linkable Ring Signature. More Ring Signature Scheme will be included.
 
 ## TODO List
 
