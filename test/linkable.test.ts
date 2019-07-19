@@ -1,4 +1,4 @@
-import { LinkableRingSignature } from '../src';
+import { LinkableRingSignature, randomPoint } from '../src';
 import 'mocha';
 import { expect } from 'chai';
 import { ec } from 'elliptic';
@@ -16,7 +16,7 @@ describe('Linkable Ring Signature', () => {
   const fake = "i am foo bar";
 
   // Mock as declared H Point
-  const h = curve.genKeyPair().getPublic().encodeCompressed('hex');
+  const h = randomPoint(curve).encodeCompressed('hex');
 
   before('generating random keypairs', () => {
     for (let i = 0 ; i < members ; i++) {

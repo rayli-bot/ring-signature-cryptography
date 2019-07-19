@@ -5,7 +5,7 @@ import { ec } from 'elliptic';
 
 describe('Ring Signature Utility', () => {
 
-  const iterator = 2000;
+  const iterator = 100;
   const seed = "i am seed 0";
   const fake = "i am seed 1";
   const curve = new ec('ed25519');
