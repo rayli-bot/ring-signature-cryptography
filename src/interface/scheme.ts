@@ -5,6 +5,7 @@ import { BasicSignature } from './type';
 export abstract class Scheme<T extends BasicSignature> {
 
   public curve: ec;
+  public name: string;
 
   public keys: ec.KeyPair[] = [];
   public get members() { return this.keys.length; }
@@ -12,9 +13,14 @@ export abstract class Scheme<T extends BasicSignature> {
   public hash: BN[] = [];
 
   // Prefer Curve as ed25519
-  constructor(keys: string[], curve?: ec) {
-    if (!curve) this.curve = new ec('ed25519')
-    else this.curve = curve;
+  constructor(keys: string[], curve?: string) {
+    if (!curve) {
+      this.curve = new ec('ed25519');
+      this.name = 'ed25519';
+    } else {
+      this.curve = new ec(curve);
+      this.name = curve;
+    }
 
     // Get KeyPairs by Public Key
     for (const key of keys) {

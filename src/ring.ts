@@ -7,7 +7,7 @@ import { random } from './util';
 
 export class RingSignature extends Scheme<BasicSignature> {
 
-  constructor(keys: string[], curve?: ec) {
+  constructor(keys: string[], curve?: string) {
     super(keys, curve);
   }
 
@@ -22,7 +22,7 @@ export class RingSignature extends Scheme<BasicSignature> {
     const key = this.curve.keyFromPrivate(keyString, 'hex');
     const secret = key.getPrivate();
 
-    // Roughly Random a 
+    // Roughly Random a Random Number smaller than N
     const u = random(N);
 
     const c: BN[] = [];

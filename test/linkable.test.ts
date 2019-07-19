@@ -1,12 +1,12 @@
-import { RingSignature } from '../src/ring';
+import { LinkableRingSignature } from '../src/linkable';
 import 'mocha';
 import { expect } from 'chai';
 import { ec } from 'elliptic';
 
-describe('Ring Signature', () => {
+describe('Linkable Ring Signature', () => {
   const members = 5;
 
-  let ring: RingSignature;
+  let ring: LinkableRingSignature;
   let pairs: ec.KeyPair[] = [];
   const curveName = 'ed25519';
   let curve: ec = new ec(curveName);
@@ -14,6 +14,9 @@ describe('Ring Signature', () => {
   // Generate Test Signature for Each Member
   const message = "i am foo";
   const fake = "i am foo bar";
+
+  // Mock as declared H Point
+  const h = curve.genKeyPair().getPublic().encodeCompressed('hex');
 
   before('generating random keypairs', () => {
     for (let i = 0 ; i < members ; i++) {
@@ -23,10 +26,11 @@ describe('Ring Signature', () => {
   });
 
   it('should create ring signature object', () => {
-    ring = new RingSignature(
+    ring = new LinkableRingSignature(
       pairs.map(x => 
         x.getPublic().encodeCompressed('hex').toString('hex')
       ),
+      h.toString('hex'),
       curveName
     );
     expect(ring).exist;
@@ -41,14 +45,14 @@ describe('Ring Signature', () => {
 
   it('should verify signature', () => {
     for (let i = 0 ; i < members ; i++) {
-      console.time('\tRing Signature : sign & verify');
+      console.time('\tLinkable Ring Signature : sign & verify');
       const str = pairs[0].getPrivate().toString('hex');
       // console.time('sign');
       const signature = ring.sign(message, 0, str);
       // console.timeEnd('sign');
       // console.time('verify');
       expect(ring.verify(message, signature)).true;
-      console.timeEnd('\tRing Signature : sign & verify');
+      console.timeEnd('\tLinkable Ring Signature : sign & verify');
       // console.timeEnd('verify');
       expect(ring.verify(fake, signature)).false;
     }
