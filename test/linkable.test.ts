@@ -43,6 +43,11 @@ describe('Linkable Ring Signature', () => {
     });
   });
 
+  it('should throw keypair not in group', () => {
+    const newPair = curve.genKeyPair();
+    expect(() => ring.sign(message, 0, newPair.getPrivate().toString('hex'))).to.throw('key error: not in group');
+  });
+
   it('should verify signature', () => {
     for (let i = 0 ; i < members ; i++) {
       console.time('\tLinkable Ring Signature : sign & verify');

@@ -32,6 +32,13 @@ export abstract class Scheme<T extends BasicSignature> {
     }
   }
 
+  protected inGroup(key: ec.KeyPair) {
+    return this.keys.findIndex(x =>
+      x.getPublic().encodeCompressed('hex').toString('hex') ===
+      key.getPublic().encodeCompressed('hex').toString('hex')
+    ) > -1;
+  }
+
   public abstract sign(message: string, position: number, keyString: string): T;
   public abstract verify(message: string, signature: T): boolean;
 }

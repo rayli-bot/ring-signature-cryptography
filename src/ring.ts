@@ -17,10 +17,14 @@ export class RingSignature extends Scheme<BasicSignature> {
     const G = this.curve.g as curve.base.BasePoint;
     const N = this.curve.n as BN;
 
-    const raw = new BN(Hash.sha512.digest(message));
-
     const key = this.curve.keyFromPrivate(keyString, 'hex');
     const secret = key.getPrivate();
+
+    // The Keypair should within the initiated group
+    if (!this.inGroup(key)) throw new Error('key error: not in group');
+
+    // Get Message
+    const raw = new BN(Hash.sha512.digest(message));
 
     // Roughly Random a Random Number smaller than N
     const u = random(N);
