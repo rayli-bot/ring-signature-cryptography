@@ -1,11 +1,10 @@
 import { ISAAC } from '../src';
 import 'mocha';
 import { expect } from 'chai';
-import { ec } from 'elliptic';
 
 describe('Psuedo Random Generator - ISSAC', () => {
 
-  // Generate Test Signature for Each Member
+  const iterator = 100;
   const seed = "i am seed 0";
   const fake = "i am seed 1";
 
@@ -13,7 +12,7 @@ describe('Psuedo Random Generator - ISSAC', () => {
     const g1 = new ISAAC();
     const g2 = new ISAAC();
 
-    for (let i = 0 ; i < 10 ; i++) {
+    for (let i = 0 ; i < iterator ; i++) {
       g1.reset(); g2.reset();
       g1.seed(seed); g2.seed(seed);
       expect(g1.rand()).equals(g2.rand());
@@ -24,7 +23,7 @@ describe('Psuedo Random Generator - ISSAC', () => {
     const g1 = new ISAAC();
     const g2 = new ISAAC();
 
-    for (let i = 0 ; i < 10 ; i++) {
+    for (let i = 0 ; i < iterator ; i++) {
       g1.reset(); g2.reset();
       g1.seed(fake); g2.seed(seed);
       expect(g1.rand()).not.equals(g2.rand());
@@ -42,7 +41,7 @@ describe('Psuedo Random Generator - ISSAC', () => {
 
   it('should generate random bytes with seed', () => {
 
-    for (let i = 0 ; i < 10 ; i++) {
+    for (let i = 0 ; i < iterator ; i++) {
       const g1 = new ISAAC(seed);
       const g2 = new ISAAC(seed);
       const g3 = new ISAAC(fake);
