@@ -68,7 +68,6 @@ describe('Linkable Ring Signature', () => {
   }).timeout(10000);
 
   it('should show linking between signatures', () => {
-    let signs = [];
     const m1 = "i am msg 1";
     const m2 = "i am msg 2";
     for (let i = 0 ; i < members ; i++) {
