@@ -39,4 +39,26 @@ describe('Psuedo Random Generator - ISSAC', () => {
       g.rand();
     console.timeEnd('\t100.000 runs');
   });
+
+  it('should generate random bytes with seed', () => {
+
+    for (let i = 0 ; i < 10 ; i++) {
+      const g1 = new ISAAC(seed);
+      const g2 = new ISAAC(seed);
+      const g3 = new ISAAC(fake);
+
+      const x1 = Buffer.from(g1.bytes(32));
+      const x2 = Buffer.from(g2.bytes(32));
+      const x3 = Buffer.from(g3.bytes(32));
+
+      expect(x1.toString('hex'))
+        .equals(x2.toString('hex'))
+        .not.equals(x3.toString('hex'));
+
+      expect(x1.byteLength)
+        .equals(x2.byteLength)
+        .equals(x3.byteLength)
+        .equals(32);
+    }
+  });
 });

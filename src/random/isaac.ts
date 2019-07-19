@@ -38,6 +38,16 @@ export class ISAAC {
   }
 
   /**
+   * Return internal state of the PRNG
+   */
+  public internals() {
+    return {
+      a: this.acc, b: this.brs,
+      c: this.cnt, m: this.m, r: this.r,
+    };
+  }
+
+  /**
    * Seeding the PRNG
    * @param s The Input Seed String
    */
@@ -150,13 +160,10 @@ export class ISAAC {
   }
 
   /**
-   * Return internal state of the PRNG
+   * Return a 32-bit fraction in the range [0, 1]
    */
-  public internals() {
-    return {
-      a: this.acc, b: this.brs,
-      c: this.cnt, m: this.m, r: this.r,
-    };
+  public random() {
+    return 0.5 + this.rand() * 2.3283064365386963e-10; // 2^-32
   }
 
   /**
@@ -206,5 +213,37 @@ export class ISAAC {
     }
 
     return r;
+  }
+
+  /**
+   * Return the inclusive range
+   * @param min The Minimum Number
+   * @param max The Maximum Number
+   */
+  public range(min: number, max: number) {
+    if (min > max) throw new Error('min is greater than max');
+
+    // Return Integer
+    if (Number.isInteger(min) && Number.isInteger(max)) {
+      return Math.floor(this.random() * (max - min + 1)) + min;
+    }
+    // Return Float
+    else {
+      return this.random() * (max - min) + min;
+    }
+  }
+
+  /**
+   * Return Random Bytes
+   * @param amount The Byte Length
+   */
+  public bytes(length: number): Uint8Array {
+    let out = new Uint8Array(length);
+
+    for (let i = 0 ; i < length ; i++) {
+      out[i] = this.range(0, 255);
+    }
+
+    return out;
   }
 }
