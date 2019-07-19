@@ -7,5 +7,5 @@ Ring Signature Javascript toolkit including Ring Signature, Linkable Ring Signat
 - [X] DTO Interface
 - [X] Keypair Geneartion
 - [X] Ring Signature Algo
-- [ ] Linkable (Traceable) Ring Signature Algo
+- [X] Linkable (Traceable) Ring Signature Algo
 - [ ] Threshold Ring Signature Algo

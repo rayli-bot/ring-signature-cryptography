@@ -66,4 +66,18 @@ describe('Linkable Ring Signature', () => {
       expect(ring.verify(fake, signature)).false;
     }
   }).timeout(10000);
+
+  it('should show linking between signatures', () => {
+    let signs = [];
+    const m1 = "i am msg 1";
+    const m2 = "i am msg 2";
+    for (let i = 0 ; i < members ; i++) {
+      const str = pairs[i].getPrivate().toString('hex');
+      const s1 = ring.sign(m1, i, str);
+      const s2 = ring.sign(m2, i, str);
+      expect(JSON.stringify(s1)).is.not.equals(JSON.stringify(s2));
+      expect(ring.isLink(m1, s1, m2, s2)).true;
+      expect(ring.isLink(m2, s1, m1, s2)).false;
+    }
+  });
 });
