@@ -1,4 +1,4 @@
-import { LinkableRingSignature } from '../src/linkable';
+import { LinkableRingSignature } from '../src';
 import 'mocha';
 import { expect } from 'chai';
 import { ec } from 'elliptic';
