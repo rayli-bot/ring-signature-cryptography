@@ -78,6 +78,7 @@ describe('Linkable Ring Signature', () => {
       expect(JSON.stringify(s1)).is.not.equals(JSON.stringify(s2));
       expect(ring.isLink(m1, s1, m2, s2)).true;
       expect(ring.isLink(m2, s1, m1, s2)).false;
+      expect(ring.isLink(fake, s1, m2, s2)).false;
     }
   });
 });
