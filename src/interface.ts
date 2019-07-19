@@ -1,5 +1,5 @@
 import { ec } from 'elliptic';
-import BN = require("bn.js");
+import BN from 'bn.js';
 
 export interface BasicSignature {
   S: string[];

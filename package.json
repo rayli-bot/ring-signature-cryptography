@@ -5,9 +5,10 @@
   "main": "index.js",
   "scripts": {
     "clean": "rimraf dist",
-    "build": "./node_modules/.bin/tsc --p .",
+    "build": "npm run clean && ./node_modules/.bin/tsc --p . && cp package.json dist/package.json",
     "lint": "./node_modules/.bin/tslint --fix -c tslint.json 'src/**/*.ts'",
-    "test": "mocha -r ts-node/register **/*.test.ts"
+    "test": "mocha -r ts-node/register **/*.test.ts",
+    "publish": "npm run build && npm publish dist"
   },
   "keywords": [
     "RingSignature",
@@ -15,6 +16,7 @@
     "Javascript"
   ],
   "author": "RayL. - PolyU",
+  "license": "MIT",
   "devDependencies": {
     "@types/bn.js": "^4.11.5",
     "@types/chai": "^4.1.7",

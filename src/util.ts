@@ -1,4 +1,4 @@
-import BN = require("bn.js");
+import BN from 'bn.js';
 import { ISAAC } from "./random/isaac";
 import { ec } from "elliptic";
 
