@@ -1,0 +1,209 @@
+<html>
+<head><title>ISAAC, a fast cryptographic random number generator</title></head>
+<body bgcolor="#ffffff" text="#000000" link="#0000ff" 
+vlink="#00ff00" alink="#ff0000">
+
+<a href="isaac.html#IBAA">
+<img align=right width=192 height=192 src="../picture/isaac.gif"></a>
+<center>
+<h2>ISAAC: a fast cryptographic random number generator</h2>
+</center>
+<hr  size=1>
+
+<p><i>I have a <a href="#challenge">challenge</a> and
+small <a href="#prize">prize</a> associated with breaking
+ISAAC.</i>
+
+<p>The files below implement <a href="isaac.html">ISAAC</a> in C.  The
+function randinit() must be called before ISAAC can be used, but after
+that any module that #includes rand.h can call rand() to get 32-bit
+random values.
+
+<p><UL>
+<LI><a href="../c/standard.h">standard.h</a>
+<LI><a href="../c/rand.h">rand.h</a>
+<LI><a href="../c/rand.c">rand.c</a> (rand.c is optimized for speed)
+<LI><a href="../c/randport.c">randport.c</a> (randport.c is optimized
+for speed except it's portable to platforms where integers are bigger
+than 4 bytes or characters are bigger than 1 byte)
+<LI><a href="../c/readable.c">readable.c</a> (readable.c produces the
+same results as rand.c but the C code is easier to read, and it
+doesn't need rand.h or standard.h)
+<LI><a href="randvect.txt">randvect.txt</a> (the results if you compile
+any of these with -DNEVER and run it)
+<LI><a href="randseed.txt">randseed.txt</a> (the results if you do 
+"gcc -O rand.c randtest.c -o rand" then run rand)
+</UL>
+
+<p>ISAAC (Indirection, Shift, Accumulate, Add,
+and Count) generates 32-bit random numbers.  Averaged out, it requires
+18.75 machine cycles to generate each 32-bit value.
+Cycles are guaranteed to be at least 2<sup>40</sup> values
+long, and they are 2<sup>8295</sup> values long on average.  The
+results are uniformly distributed, unbiased, and unpredictable unless
+you know the seed.
+
+<p>Others have translated ISAAC into other languages:
+<ul>
+<li><a href="http://phma.optus.nu/">Pierre
+Abbat</a> has implemented ISAAC in <a
+href="http://phma.optus.nu/Crypto/isaac.html">Forth</a>
+(<a href="fisaac.txt">local copy</a>).  
+<li>Quinn Tyler Jackson translated 
+it to <a href="../cplus/isaac.hpp">C++</a>.
+<li><a href="http://www.spacegroove.com/telic/bn/embedded">Greg Vigneault</a> has
+implemented it in 
+<a href="http://www.spacegroove.com/telic/files/M2ISAAC.ZIP">Modula-2</a>, a
+language that doesn't support bit operations!  
+(<a href="m2isaac.zip">local copy</a>)
+<li>Sebastian Sauvage translated it into 
+<a href="http://sebsauvage.net/isaac/">Delphi</a> 
+(<a href="dlisaac.zip">local copy</a>).
+<li>John L. Allen translated it into <a href="randperl.txt">Perl</a>.
+<li>Daniel Berlin produced a <a href="JavaISAAC.zip">Java</a>
+implementation that I haven't got around to checking yet.
+<li><a href="http://www.eecs.cwru.edu/people/faculty/mss">Marv
+Schwartz</a> translated Isaac into <a href="csharp_isaac.zip">C#</a>.
+<li>I translated it into <a href="../java/rand/Rand.java">Java</a>,
+as well.  It had a bug for a long time that made it initialize
+differently than the C version, but Paul Wankadia pointed it out and I
+fixed it (Sept 30 2005).
+<li>Kenneth Ives translated it into <a href="basISAAC.txt">Visual Basic</a>, with <a href="Isaac_Tests.zip">tests</a>.
+<li>Doug Hoyte translated it into <a href="http://hcsw.org/haskell/isaac.hs">
+Haskell</a> (<a href="isaac.hs">local copy</a>).
+<li>Doug Hoyte translated it into <a href="http://hcsw.org/downloads/isaac.lisp">
+Lisp</a>, too  (<a href="isaac.lisp">local copy</a>).
+<li>Gerald Moull has <a
+href="ftp://ftp.mydocz.com/pub/ISAAC.cbl">translated</a> it into <a
+href="ISAAC.cbl">Cobol</a>.
+<li>Wolfgang Ehrhardt has implemented it in <a
+href="http://www.wolfgang-ehrhardt.de/misc_en.html">Pascal</a>,
+along with many other PRNGs.
+<li>Ilmari Karonen translated it into <a href="http://stackoverflow.com/a/14428399">PHP</a>.
+<li>Yves-Marie K. Rinquin implemented it in <a href="https://github.com/rubycon/isaac.js">
+JavaScript (MIT license)</a>
+</ul>
+
+<p>ISAAC-64 generates a different sequence than ISAAC, but it uses the
+same principles.  It uses 64-bit arithmetic.  It generates a 64-bit result
+every 19 instructions.  All cycles are at least 2<sup>72</sup> values,
+and the average cycle length is 2<sup>16583</sup>.
+
+<p>The following files implement ISAAC-64.
+The constants were tuned for a 64-bit machine, and a complement was
+thrown in so that all-zero states become nonzero faster.
+
+<p><UL>
+<LI><a href="../c/standard.h">standard.h</a>
+<LI><a href="../c/isaac64.h">isaac64.h</a>
+<LI><a href="../c/isaac64.c">isaac64.c</a>
+</UL>
+
+<p>There are lots of random number generators out there.  Why use ISAAC?
+<UL>
+<LI>Why not use x=ax+b mod p?  Because multiplication and mod
+are slow.  On a Sparc it was clocked at being five times slower than
+ISAAC.  Also, ISAAC gives any 32-bit number, while ax+b mod p gives
+numbers between 0 and p-1 for some prime p.  Also, ax+b has easily
+detected patterns (for example, x<sub>i+1</sub> is always
+ax<sub>i</sub>+b mod p).
+
+<LI>Why not use <a
+href="http://www.wisdom.weizmann.ac.il/~itsik/RC4/rc4.html">RC4</a>?
+RC4 is three times slower, more biased, has a
+shorter minimum and average cycle length, and is proprietary.  No way
+is known to break either RC4 or ISAAC; both are immune to Gaussian
+elimination.  Use the gap test on scaled-down RC4 to see its
+bias.  (RC4 is still very good, much much better than x=(ax+b)%p.)
+
+<LI>I've written some <a href="testsfor.html">tests for random number
+generators</a>, which can be used to test ISAAC, RC4, ax+b mod p, or
+any random number generator you feel like writing.
+
+<LI>ISAAC should work on any 32-bit platform.  (Porting it to a 64-bit
+machine like ALPHA may require masking out overflows in <tt>a</tt>,
+<tt>randrsl</tt>, and <tt>mm</tt>, or it may just need an adjustment of
+the definition of ub4, or it may work without modification.  If someone
+ports it to an ALPHA, send me mail at <a href =
+"mailto:bob_jenkins@burtleburtle.net"><i>bob_jenkins@burtleburtle.net</i></a>
+showing me what you did.)  The code in isaac64.c
+<i>has</i> been run on an ALPHA and a x486 with gcc; it produces the 
+same results on both.
+
+<LI>I presented a paper, <b>ISAAC</b>, at the 3rd Fast Software
+Encryption Workshop.  An online version, somewhat more complete than
+the published version, is <a href="isaac.html">here</a>.
+
+<LI>Bias is detectable after 2<sup>37</sup> values for RANDSIZL=3, 2<sup>45</sup> for 4, 2<sup>53</sup> for 5,
+2<sup>61</sup> for 6, 2<sup>69</sup> for 7, and 2<sup>77</sup> values
+for RANDSIZL=8.
+
+<LI><a name="challenge"><b>Challenge, started 1996/march/27:</b></a>
+The files
+<UL>
+<LI><a href="../c/standard.h">standard.h</a>
+<LI><a href="../c/rand.h">rand.h</a>
+<LI><a href="../c/rand.c">rand.c</a>
+<LI><a href="../c/randtest.c">randtest.c</a>
+</UL>
+randtest.c gives the first 2560 results of ISAAC initialized with an unknown
+seed, along with the program that initialized ISAAC and produced the
+results.  What was the seed?  Send mail to <a href =
+"mailto:bob_jenkins@burtleburtle.net"><i>bob_jenkins@burtleburtle.net</i></a>.
+(Converting bytes to ub4's is endian-dependent, so the seed will
+only be English on something like an 80?86 machine.)  
+
+<p>I changed the seed 1998/february/10 because I can't reproduce the old
+seed.  Breaking either the old or the new counts.
+
+<LI><a name="prize"><b>PRIZE, started 1998/february/6</b></a>: $1000
+(USA dollars) to whoever sends me the solution to the above <a
+href="#challenge">challenge (plus publicly revealing a
+repeatable method for determining it)</a> first.  I'll also offer $100 for
+the first bias that can be detected with RANDSIZL=8 (in sequences of
+length less than 2<sup>64</sup> values) (starting with almost all
+seeds) (exceeding an absolute value of 4 times the standard deviation)
+(the test must start not knowing the seed).
+
+<p>ISAAC hasn't been broken since it was published 11 years ago.  No
+bias has been detected either.  I am offering these prizes in an 
+attempt to get others to try to break it and assure those techniques 
+are published.  Apologies for having such a small prize.  If you find
+successful attacks or biases in smaller versions of ISAAC, I'll 
+include them in <a href="isaac.html">isaac.html</a>, even though 
+there are no prizes for them.  I'm interested in attacks and biases 
+against RC4 as well.  Other fast stream ciphers are SEAL and WAKE.
+</UL></p>
+
+<hr size=1>
+<p>Attacks on ISAAC by someone other than Bob Jenkins:
+<ul>
+<li>2001: Marina Pudovkina published an <a href=
+"http://eprint.iacr.org/2001/049.pdf">attack on ISAAC</a>
+with estimated running time of 4.67x10<sup>1240</sup>.
+<li>2006: Jean-Phillipe Aumasson pointed out that I provided no
+official way of seeding ISAAC.  If the lack of an official seeding
+routine is interpreted as allowing a null seeding routine (directly
+setting the internal state to a known value), that allows the output
+to be predicted.
+<p>I provided no official seeding routine because I didn't feel
+competent to give one.  Seeding a random number generator is
+essentially the same problem as encrypting the seed with a block
+cipher.  ISAAC should be initialized with the encryption of the seed
+by some secure cipher.  I've provided a seeding routine in my
+implementations, which nobody has broken so far, but I have less faith
+in that initialization routine than I have in ISAAC.
+<p>As ISAAC is intended to be a secure cipher, if you want to
+reseed it, one way is to use some other cipher to seed some initial
+version of ISAAC, then use ISAAC's output as a seed for other
+instances of ISAAC whenever they need to be reseeded.
+</ul>
+
+<hr size=1>
+<p>Internal links:
+<br><a href="../hash/index.html">Hash functions and block ciphers</a>
+<br><a href="../physics/whythere.html">Perpetual motion machines</a>
+<br><a href="../index.html">Table of Contents</a>
+
+</body>
+</html>
