@@ -1,6 +1,14 @@
 import { ec } from 'elliptic';
 import BN = require("bn.js");
-import { BasicSignature } from './type';
+
+export interface BasicSignature {
+  S: string[];
+  C: string;
+};
+
+export interface LinkableSignature extends BasicSignature {
+  Y: string;
+};
 
 export abstract class Scheme<T extends BasicSignature> {
 

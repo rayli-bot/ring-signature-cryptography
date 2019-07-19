@@ -1,7 +1,6 @@
-import { ec, curve } from 'elliptic';
+import { curve } from 'elliptic';
 import BN = require("bn.js");
-import { LinkableSignature } from './interface/type';
-import { Scheme } from './interface/scheme';
+import { LinkableSignature, Scheme } from './interface';
 import * as Hash from 'js-sha512';
 import { random } from './util';
 
