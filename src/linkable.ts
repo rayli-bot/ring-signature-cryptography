@@ -4,9 +4,18 @@ import { LinkableSignature, Scheme } from './interface';
 import * as Hash from 'js-sha512';
 import { random } from './util';
 
+/**
+ * Linkable Ring Signature
+ */
 export class LinkableRingSignature extends Scheme<LinkableSignature> {
   public H: curve.base.BasePoint;
 
+  /**
+   * Initialize Linkable Ring Signature Instance
+   * @param keys Public Keys of Group Members
+   * @param h The predefined Generator Point
+   * @param curve The Elliptic Curve
+   */
   constructor(keys: string[], h: string, curve?: string) {
     super(keys, curve);
 
@@ -14,6 +23,12 @@ export class LinkableRingSignature extends Scheme<LinkableSignature> {
     this.H = this.curve.curve.decodePoint(h, 'hex') as curve.base.BasePoint;
   }
 
+  /**
+   * Sign The Ring
+   * @param message The Signing Message
+   * @param position The Key Position
+   * @param keyString The Member's Public Key String in hex
+   */
   public sign(message: string, position: number, keyString: string): LinkableSignature {
 
     // Get Global Parameters
@@ -91,6 +106,11 @@ export class LinkableRingSignature extends Scheme<LinkableSignature> {
     };
   };
 
+  /**
+   * Verify a Signature with the signed message
+   * @param message The Signed Message
+   * @param signature The Ring Signature Instance
+   */
   public verify(message: string, signature: LinkableSignature): boolean {
 
     // Get Global Parameters
@@ -122,6 +142,13 @@ export class LinkableRingSignature extends Scheme<LinkableSignature> {
     return signature.C === ci.toString('hex');
   };
 
+  /**
+   * Check is two signature valid and linked (signed by the same signer).
+   * @param m1 The 1st Signed Message
+   * @param s1 The 1st Signature
+   * @param m2 The 2nd Signed Message
+   * @param s2 The 2nd Signature
+   */
   public isLink(m1: string, s1: LinkableSignature, m2: string, s2: LinkableSignature) {
     if (!this.verify(m1, s1)) return false;
     if (!this.verify(m2, s2)) return false;

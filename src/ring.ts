@@ -4,12 +4,26 @@ import { BasicSignature, Scheme } from './interface';
 import * as Hash from 'js-sha512';
 import { random } from './util';
 
+/**
+ * Classic Ring Signature Scheme
+ */
 export class RingSignature extends Scheme<BasicSignature> {
 
+  /**
+   * Initialize Ring Signature Instance
+   * @param keys Public Keys of Group Members
+   * @param curve The Elliptic Curve
+   */
   constructor(keys: string[], curve?: string) {
     super(keys, curve);
   }
 
+  /**
+   * Sign The Ring
+   * @param message The Signing Message
+   * @param position The Key Position
+   * @param keyString The Member's Public Key String in hex
+   */
   public sign(message: string, position: number, keyString: string): BasicSignature {
 
     // Get Global Parameters
@@ -72,6 +86,11 @@ export class RingSignature extends Scheme<BasicSignature> {
     };
   };
 
+  /**
+   * Verify a Signature with the signed message
+   * @param message The Signed Message
+   * @param signature The Ring Signature Instance
+   */
   public verify(message: string, signature: BasicSignature): boolean {
 
     // Get Global Parameters
