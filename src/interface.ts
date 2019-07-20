@@ -20,12 +20,13 @@ export interface LinkableSignature extends BasicSignature {
 export interface Signer {
   key: string;
   ref: string;
+  S: string;
 };
 
 /**
  * Common Scheme for Ring Signature
  */
-export abstract class Scheme<T extends BasicSignature> {
+export abstract class Scheme<T extends BasicSignature, K> {
 
   public curve: ec;
   public name: string;  // The Curve Name
@@ -85,7 +86,7 @@ export abstract class Scheme<T extends BasicSignature> {
    * @param position The Key Position
    * @param keyString The Member's Public Key String in hex
    */
-  public abstract sign(message: string, position: number, keyString: string): T;
+  public abstract sign(message: string, position: number, keyString: string): K;
 
   /**
    * Common Interface for Verifying a Signature with the signed message

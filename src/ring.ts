@@ -7,7 +7,7 @@ import { random } from './util';
 /**
  * Classic Ring Signature Scheme
  */
-export class RingSignature extends Scheme<BasicSignature> {
+export class RingSignature extends Scheme<BasicSignature, BasicSignature> {
 
   /**
    * Initialize Ring Signature Instance
@@ -45,10 +45,11 @@ export class RingSignature extends Scheme<BasicSignature> {
     const c: BN[] = [];
     const s: BN[] = [];
 
-    const encoded_secret = new BN(G.mul(u).encodeCompressed('array'));
+    // Secret Random Number for Signing
+    const encoded_rn = new BN(G.mul(u).encodeCompressed('array'));
 
     // Build the Signature Message
-    const cipher = this.hash.concat(raw).concat(encoded_secret)
+    const cipher = this.hash.concat(raw).concat(encoded_rn)
       .map(x => x.toArray()).reduce((a, b) => a.concat(b), []);
     const b = new BN(Hash.sha512.digest(cipher));
 

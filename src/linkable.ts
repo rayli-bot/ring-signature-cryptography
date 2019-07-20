@@ -7,7 +7,7 @@ import { random } from './util';
 /**
  * Linkable Ring Signature
  */
-export class LinkableRingSignature extends Scheme<LinkableSignature> {
+export class LinkableRingSignature extends Scheme<LinkableSignature, LinkableSignature> {
   public H: curve.base.BasePoint;
 
   /**
@@ -55,11 +55,13 @@ export class LinkableRingSignature extends Scheme<LinkableSignature> {
     const s: BN[] = [];
 
     const encoded_y      = new BN(y.encodeCompressed('array'));
-    const encoded_secret = new BN(G.mul(u).encodeCompressed('array'));
+    // Secret Random Number for Signing
+    const encoded_rn = new BN(G.mul(u).encodeCompressed('array'));
+    // Secret Random Number for Linking
     const encoded_link   = new BN(H.mul(u).encodeCompressed('array'));
 
     // Build the Signature Message
-    const cipher = this.hash.concat(encoded_y).concat(raw).concat(encoded_secret).concat(encoded_link)
+    const cipher = this.hash.concat(encoded_y).concat(raw).concat(encoded_rn).concat(encoded_link)
       .map(x => x.toArray()).reduce((a, b) => a.concat(b), []);
     const b = new BN(Hash.sha512.digest(cipher));
 
