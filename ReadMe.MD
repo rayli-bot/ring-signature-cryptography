@@ -97,6 +97,54 @@ ring.isLink("i am message 1", s1, "i am message 2", s2); // should return true
 ring.isLink("i am message 1", s1, "i am message 1", s3); // should return false
 ```
 
+
+
+## Algorithm Flow
+
+####Classical Ring Signature
+
+```txt
+Curve / RSA: { G, N }
+Keypair: { x[i] (SK), y[i] (PK) }
+L: {y[0],..., y[n]}
+message: m
+
+# Case 1 - position: p = 1
+
+### 
+u = {0, 1} ∈ N
+
+T = g ** u
+
+c[p + 1] = H(L || m || T)
+
+# Ring Operation until i = (p + 1)
+s[i-1] = {0, 1} ∈ N
+t[i] = (g ** s[i-1]) * (Y[i-1] ** c[i-1])
+c[i] = H(L || m || t[i])
+# End of Ring Operation
+
+s[p] = u - c[p] ** x[p]
+
+return { s, c[0] as C }
+
+
+# Verification
+
+for {0...n}
+	T[i] = (G ** s[i]) * (y[i] ** c[i])
+	c[i] = H(L || m || T[i])
+
+return c[n] == c[i]
+```
+
+
+
+
+
+
+
 ### Appendix
 
 - [Psuedo Random Generator Distribution Test](https://www.khanacademy.org/computer-programming/prng-test/5500564014432256)
+
