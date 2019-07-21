@@ -17,9 +17,9 @@ export interface LinkableSignature extends BasicSignature {
 };
 
 
-export interface Signer {
-  key: string;
-  ref: string;
+export interface PartialSign {
+  index: number;
+  C: string;
   S: string;
 };
 
@@ -59,7 +59,7 @@ export abstract class Scheme<T extends BasicSignature, K> {
       this.keys.push(pair);
 
       // Append to Scheme's Key String
-      this.hash.concat(pair.getPublic().encodeCompressed("array"));
+      this.hash.push(pair.getPublic().encodeCompressed('array'));
     }
   }
 
