@@ -84,5 +84,5 @@ describe('Linkable Ring Signature', () => {
       expect(ring.isLink(m2, s1, m1, s2)).false;
       expect(ring.isLink(fake, s1, m2, s2)).false;
     }
-  });
+  }).timeout(10000);
 });

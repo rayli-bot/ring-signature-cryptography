@@ -43,7 +43,7 @@ export class LinkableRingSignature extends Scheme<LinkableSignature, LinkableSig
     if (!this.inGroup(key, position)) throw new Error('key error: not in group');
 
     // Get Message
-    const raw = new BN(Hash.sha512.digest(message));
+    const raw = new BN(Hash.sha512_256.digest(message));
 
     // Roughly Random a Random Number smaller than N
     const u = random(N);
@@ -62,8 +62,8 @@ export class LinkableRingSignature extends Scheme<LinkableSignature, LinkableSig
 
     // Build the Signature Message
     const cipher = this.hash.concat(encoded_y).concat(raw).concat(encoded_rn).concat(encoded_link)
-      .map(x => x.toArray()).reduce((a, b) => a.concat(b), []);
-    const b = new BN(Hash.sha512.digest(cipher));
+      .map(x => new BN(x).toArray()).reduce((a, b) => a.concat(b), []);
+    const b = new BN(Hash.sha512_256.digest(cipher));
 
     // Initialize the first element
     c[(position + 1) % this.members] = b;
@@ -91,9 +91,9 @@ export class LinkableRingSignature extends Scheme<LinkableSignature, LinkableSig
       const yi = new BN(y2.add(y1).encodeCompressed('array'));
 
       const ci = this.hash.concat(encoded_y).concat(raw).concat(xi).concat(yi)
-        .map(x => x.toArray()).reduce((a, b) => a.concat(b), []);
+        .map(x => new BN(x).toArray()).reduce((a, b) => a.concat(b), []);
 
-      c[i] = new BN(Hash.sha512.digest(ci));
+      c[i] = new BN(Hash.sha512_256.digest(ci));
     }
 
     // Sn = u - Cn * Xn
@@ -119,7 +119,7 @@ export class LinkableRingSignature extends Scheme<LinkableSignature, LinkableSig
     const G = this.curve.g as curve.base.BasePoint;
     const H = this.H;
 
-    const raw = new BN(Hash.sha512.digest(message));
+    const raw = new BN(Hash.sha512_256.digest(message));
 
     let ci = new BN(signature.C, 'hex');
     let encoded_y = new BN(signature.Y, 'hex');
@@ -137,8 +137,8 @@ export class LinkableRingSignature extends Scheme<LinkableSignature, LinkableSig
       const bi = new BN(b2.add(b1).encodeCompressed('array'));
   
       const temp = this.hash.concat(encoded_y).concat(raw).concat(ai).concat(bi)
-        .map(x => x.toArray()).reduce((a, b) => a.concat(b), []);
-      ci = new BN(Hash.sha512.digest(temp));
+        .map(x => new BN(x).toArray()).reduce((a, b) => a.concat(b), []);
+      ci = new BN(Hash.sha512_256.digest(temp));
     }
 
     return signature.C === ci.toString('hex');
