@@ -26,6 +26,7 @@ export class ISAAC {
   constructor(seed?: string) {
     this.reset();
     if (seed) this.seed(seed);
+    else this.seed(Math.random() * 0xffffffff);
   }
 
   /**
