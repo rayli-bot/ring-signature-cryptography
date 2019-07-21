@@ -6,6 +6,7 @@ import { random } from './util';
 
 /**
  * Classic Ring Signature Scheme
+ * https://people.csail.mit.edu/rivest/pubs/RST01.pdf
  */
 export class RingSignature extends Scheme<BasicSignature, BasicSignature> {
 

@@ -6,6 +6,7 @@ import { random } from './util';
 
 /**
  * Linkable Ring Signature
+ * https://pdfs.semanticscholar.org/1b0a/789633f94ec9c32ceeeea51afa2d2aff98c3.pdf
  */
 export class LinkableRingSignature extends Scheme<LinkableSignature, LinkableSignature> {
   public H: curve.base.BasePoint;
