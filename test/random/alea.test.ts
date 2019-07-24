@@ -1,4 +1,4 @@
-import { ALEA } from '../src';
+import { ALEA } from '../../src';
 import 'mocha';
 import { expect } from 'chai';
 

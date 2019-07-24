@@ -1,4 +1,4 @@
-import { RingSignature } from '../src';
+import { RingSignature } from '../../../src';
 import 'mocha';
 import { expect } from 'chai';
 import { ec } from 'elliptic';

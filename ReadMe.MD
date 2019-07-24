@@ -8,7 +8,8 @@ Ring Signature Javascript toolkit including classic Ring Signature, Linkable Rin
 - [X] Keypair Geneartion
 - [X] Ring Signature Algo
 - [X] Linkable (Traceable) Ring Signature Algo
-- [X] Cryptographically secure pseudorandom number generator
+- [X] Cryptographically secure psuedo random number generator (ISAAC)
+- [X] Fast Psuedo random number generator (ALEA)
 - [X] Psuedo EC Point Generator
 
 ## Future Development
@@ -95,10 +96,3 @@ ring.verify("i am message 1", s3); // should return true
 ring.isLink("i am message 1", s1, "i am message 2", s2); // should return true
 ring.isLink("i am message 1", s1, "i am message 1", s3); // should return false
 ```
-
-
-
-### Appendix
-
-- [Psuedo Random Generator Distribution Test](https://www.khanacademy.org/computer-programming/prng-test/5500564014432256)
-

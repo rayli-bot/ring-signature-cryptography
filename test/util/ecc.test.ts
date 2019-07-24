@@ -1,4 +1,4 @@
-import { random, randomKeyPair, randomPoint } from '../src';
+import { random, randomKeyPair, randomPoint } from '../../src';
 import 'mocha';
 import { expect } from 'chai';
 import { ec } from 'elliptic';
