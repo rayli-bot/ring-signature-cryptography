@@ -50,10 +50,10 @@ export class RingSignature extends Scheme<BasicSignature, BasicSignature> {
     const encoded_rn = new BN(G.mul(u).encodeCompressed('array'));
 
     // Build the Signature Message
-    let cipher = this.hash.concat(raw).concat(encoded_rn);
+    let cipher = this.hash.concat(raw).concat(encoded_rn)
+      .map(x => new BN(x).toArray()).reduce((a, b) => a.concat(b), []);
 
-    const xx = cipher.map(x => new BN(x).toArray()).reduce((a, b) => a.concat(b), []);
-    const b = new BN(Hash.sha512_256.digest(xx));
+    const b = new BN(Hash.sha512_256.digest(cipher));
 
     // Initialize the first element
     c[(position + 1) % this.members] = b;
