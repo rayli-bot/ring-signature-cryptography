@@ -13,7 +13,6 @@ Ring Signature Javascript toolkit including classic Ring Signature, Linkable Rin
 
 ## Future Development
 
-- [ ] Threshold Ring Signature Algo
 - [ ] Lattice-based Ring Signature
 - [ ] Lattice-based Linkable Ring Signature
 - [ ] Hybrid Mobile App Benchmark

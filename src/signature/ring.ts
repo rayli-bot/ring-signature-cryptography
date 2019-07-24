@@ -1,27 +1,22 @@
 import { curve } from 'elliptic';
 import BN from 'bn.js';
-import { LinkableSignature, Scheme } from './interface';
+import { BasicSignature, Scheme } from '../interface';
 import * as Hash from 'js-sha512';
-import { random } from './util';
+import { random } from '../util';
 
 /**
- * Linkable Ring Signature
- * https://pdfs.semanticscholar.org/1b0a/789633f94ec9c32ceeeea51afa2d2aff98c3.pdf
+ * Classic Ring Signature Scheme
+ * https://people.csail.mit.edu/rivest/pubs/RST01.pdf
  */
-export class LinkableRingSignature extends Scheme<LinkableSignature, LinkableSignature> {
-  public H: curve.base.BasePoint;
+export class RingSignature extends Scheme<BasicSignature, BasicSignature> {
 
   /**
-   * Initialize Linkable Ring Signature Instance
+   * Initialize Ring Signature Instance
    * @param keys Public Keys of Group Members
-   * @param h The predefined Generator Point
    * @param curve The Elliptic Curve
    */
-  constructor(keys: string[], h: string, curve?: string) {
+  constructor(keys: string[], curve?: string) {
     super(keys, curve);
-
-    // This Point should be setup before
-    this.H = this.curve.curve.decodePoint(h, 'hex') as curve.base.BasePoint;
   }
 
   /**
@@ -30,11 +25,10 @@ export class LinkableRingSignature extends Scheme<LinkableSignature, LinkableSig
    * @param position The Key Position
    * @param keyString The Member's Public Key String in hex
    */
-  public sign(message: string, position: number, keyString: string): LinkableSignature {
+  public sign(message: string, position: number, keyString: string): BasicSignature {
 
     // Get Global Parameters
     const G = this.curve.g as curve.base.BasePoint;
-    const H = this.H;
     const N = this.curve.n as BN;
 
     const key = this.curve.keyFromPrivate(keyString, 'hex');
@@ -49,21 +43,16 @@ export class LinkableRingSignature extends Scheme<LinkableSignature, LinkableSig
     // Roughly Random a Random Number smaller than N
     const u = random(N);
 
-    // Get Secret Linkable Number
-    const y = H.mul(secret);
-
     const c: BN[] = [];
     const s: BN[] = [];
 
-    const encoded_y      = new BN(y.encodeCompressed('array'));
     // Secret Random Number for Signing
     const encoded_rn = new BN(G.mul(u).encodeCompressed('array'));
-    // Secret Random Number for Linking
-    const encoded_link   = new BN(H.mul(u).encodeCompressed('array'));
 
     // Build the Signature Message
-    const cipher = this.hash.concat(encoded_y).concat(raw).concat(encoded_rn).concat(encoded_link)
+    let cipher = this.hash.concat(raw).concat(encoded_rn)
       .map(x => new BN(x).toArray()).reduce((a, b) => a.concat(b), []);
+
     const b = new BN(Hash.sha512_256.digest(cipher));
 
     // Initialize the first element
@@ -71,7 +60,6 @@ export class LinkableRingSignature extends Scheme<LinkableSignature, LinkableSig
 
     // Ring Operation
     for (let i = (position + 2) % this.members ; i !== (position + 1) % this.members ; i = (i + 1) % this.members) {
-      // The Previous Index
       const j = (this.members + ((i-1) % this.members)) % this.members;
       s[j] = random(N);
 
@@ -84,14 +72,7 @@ export class LinkableRingSignature extends Scheme<LinkableSignature, LinkableSig
       // Tn = Yn^Cn * g^Sn % p
       const xi = new BN(x2.add(x1).encodeCompressed('array'));
 
-      // h^Sn
-      const y1 = H.mul(s[j]);
-      // y^Cn
-      const y2 = y.mul(c[j]);
-      // Zn = y^Cn * h^Sn % p
-      const yi = new BN(y2.add(y1).encodeCompressed('array'));
-
-      const ci = this.hash.concat(encoded_y).concat(raw).concat(xi).concat(yi)
+      const ci = this.hash.concat(raw).concat(xi)
         .map(x => new BN(x).toArray()).reduce((a, b) => a.concat(b), []);
 
       c[i] = new BN(Hash.sha512_256.digest(ci));
@@ -104,8 +85,7 @@ export class LinkableRingSignature extends Scheme<LinkableSignature, LinkableSig
 
     return {
       S: s.map(x => x.toString('hex')),
-      C: c[0].toString('hex'),
-      Y: encoded_y.toString('hex'),
+      C: c[0].toString('hex')
     };
   };
 
@@ -114,47 +94,26 @@ export class LinkableRingSignature extends Scheme<LinkableSignature, LinkableSig
    * @param message The Signed Message
    * @param signature The Ring Signature Instance
    */
-  public verify(message: string, signature: LinkableSignature): boolean {
+  public verify(message: string, signature: BasicSignature): boolean {
 
     // Get Global Parameters
     const G = this.curve.g as curve.base.BasePoint;
-    const H = this.H;
 
     const raw = new BN(Hash.sha512_256.digest(message));
 
     let ci = new BN(signature.C, 'hex');
-    let encoded_y = new BN(signature.Y, 'hex');
-    let yi = this.curve.curve.decodePoint(signature.Y, 'hex') as curve.base.BasePoint;
 
     for (let i = 0 ; i < this.members ; i++) {
       const si = new BN(signature.S[i], 'hex');
-
       const a1 = G.mul(si);
       const a2 = this.keys[i].getPublic().mul(ci);
       const ai = new BN(a2.add(a1).encodeCompressed('array'));
-
-      const b1 = H.mul(si);
-      const b2 = yi.mul(ci);
-      const bi = new BN(b2.add(b1).encodeCompressed('array'));
   
-      const temp = this.hash.concat(encoded_y).concat(raw).concat(ai).concat(bi)
+      const temp = this.hash.concat(raw).concat(ai)
         .map(x => new BN(x).toArray()).reduce((a, b) => a.concat(b), []);
       ci = new BN(Hash.sha512_256.digest(temp));
     }
 
     return signature.C === ci.toString('hex');
   };
-
-  /**
-   * Check is two signature valid and linked (signed by the same signer).
-   * @param m1 The 1st Signed Message
-   * @param s1 The 1st Signature
-   * @param m2 The 2nd Signed Message
-   * @param s2 The 2nd Signature
-   */
-  public isLink(m1: string, s1: LinkableSignature, m2: string, s2: LinkableSignature) {
-    if (!this.verify(m1, s1)) return false;
-    if (!this.verify(m2, s2)) return false;
-    return s1.Y === s2.Y;
-  }
 }
