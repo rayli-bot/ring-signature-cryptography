@@ -1,3 +1,6 @@
+import * as Hash from "js-sha512";
+import { str2IntArray } from '../util';
+
 /**
  * 32-bit integer safe adder
  * @param x 1st 32-bit integer
@@ -9,6 +12,10 @@ export function add(x: number, y: number) {
   return (msb << 16) | (lsb & 0xffff);
 };
 
+/**
+ * ISAAC Cryptographically Secure Psuedo Random Number Generator (CSPRNG)
+ * https://burtleburtle.net/bob/rand/isaacafa.html
+ */
 export class ISAAC {
   // internal memory
   m = new Array<number>(256);
@@ -23,10 +30,11 @@ export class ISAAC {
   // generation counter
   gnt = 0;
 
-  constructor(seed?: string) {
+  constructor(seed: string | number[] | false = false) {
     this.reset();
-    if (seed) this.seed(seed);
-    else this.seed(Math.random() * 0xffffffff);
+    if (!seed) seed = [Math.random() * 0xffffffff];
+    seed = Hash.sha512_256(seed);
+    this.seed(seed);
   }
 
   /**
@@ -41,11 +49,17 @@ export class ISAAC {
   /**
    * Return internal state of the PRNG
    */
-  public internals() {
+  public export() {
     return {
       a: this.acc, b: this.brs,
       c: this.cnt, m: this.m, r: this.r,
     };
+  }
+
+  public import(state: { a: number, b: number, c: number, m: number[], r: number[] }) {
+    this.acc = state.a; this.brs = state.b;
+    this.cnt = state.c; this.m = state.m;
+    this.r = state.r;
   }
 
   /**
@@ -60,7 +74,7 @@ export class ISAAC {
     a = b = c = d = e = f = g = h = 0x9e3779b9;
 
     if(s && typeof s === 'string') {
-      s = this.toIntArray(s);
+      s = str2IntArray(s);
     }
 
     if(s && typeof(s) === 'number') {
@@ -165,55 +179,6 @@ export class ISAAC {
    */
   public random() {
     return 0.5 + this.rand() * 2.3283064365386963e-10; // 2^-32
-  }
-
-  /**
-   * Transform String to Integer Array
-   * @param data The Input String Data
-   */
-  private toIntArray(data: string) {
-    let w1, w2, u, r4: number[] = [], r = [], i = 0;
-    let s = data + '\0\0\0'; // pad string to avoid discarding last chars
-    let l = s.length - 1;
-
-    while(i < l) {
-      w1 = s.charCodeAt(i++);
-      w2 = s.charCodeAt(i+1);
-      if       (w1 < 0x0080) {
-        // 0x0000 - 0x007f code point: basic ascii
-        r4.push(w1);
-      } else if(w1 < 0x0800) {
-        // 0x0080 - 0x07ff code point
-        r4.push(((w1 >>>  6) & 0x1f) | 0xc0);
-        r4.push(((w1 >>>  0) & 0x3f) | 0x80);
-      } else if((w1 & 0xf800) != 0xd800) {
-        // 0x0800 - 0xd7ff / 0xe000 - 0xffff code point
-        r4.push(((w1 >>> 12) & 0x0f) | 0xe0);
-        r4.push(((w1 >>>  6) & 0x3f) | 0x80);
-        r4.push(((w1 >>>  0) & 0x3f) | 0x80);
-      } else if(((w1 & 0xfc00) == 0xd800)
-             && ((w2 & 0xfc00) == 0xdc00)) {
-        // 0xd800 - 0xdfff surrogate / 0x10ffff - 0x10000 code point
-        u = ((w2 & 0x3f) | ((w1 & 0x3f) << 10)) + 0x10000;
-        r4.push(((u >>> 18) & 0x07) | 0xf0);
-        r4.push(((u >>> 12) & 0x3f) | 0x80);
-        r4.push(((u >>>  6) & 0x3f) | 0x80);
-        r4.push(((u >>>  0) & 0x3f) | 0x80);
-        i++;
-      } else {
-        // invalid char
-      }
-      /* add integer (four utf-8 value) to array */
-      if(r4.length > 3) {
-        // little endian
-        r.push(
-          (r4.shift() as number <<  0) | (r4.shift() as number <<  8) |
-          (r4.shift() as number << 16) | (r4.shift() as number << 24)
-        );
-      }
-    }
-
-    return r;
   }
 
   /**
