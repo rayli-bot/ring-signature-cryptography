@@ -1,8 +1,8 @@
 import { curve } from 'elliptic';
 import BN from 'bn.js';
-import { BasicSignature, Scheme } from '../interface';
+import { BasicSignature, Scheme } from './interface';
 import * as Hash from 'js-sha512';
-import { random } from '../util';
+import { random } from '../../util';
 
 /**
  * Classic Ring Signature Scheme

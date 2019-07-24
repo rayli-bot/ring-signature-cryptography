@@ -1,8 +1,8 @@
 import { curve } from 'elliptic';
 import BN from 'bn.js';
-import { LinkableSignature, Scheme } from '../interface';
+import { LinkableSignature, Scheme } from './interface';
 import * as Hash from 'js-sha512';
-import { random } from '../util';
+import { random } from '../../util';
 
 /**
  * Linkable Ring Signature
