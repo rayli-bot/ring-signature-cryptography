@@ -1,5 +1,5 @@
 import * as Hash from "js-sha512";
-import { toByteArray } from "../util";
+import { Bytes } from "../util";
 
 /**
  * Alea Psuedo Random Number Generator
@@ -14,7 +14,7 @@ export class ALEA {
 
   constructor(args: string | number[] = []) {
 
-    if (typeof args === 'string') args = toByteArray(Hash.sha512_256(args));
+    if (typeof args === 'string') args = Bytes.toByteArray(Hash.sha512_256(args));
 
     if (args.length === 0) args = [+new Date()];
 

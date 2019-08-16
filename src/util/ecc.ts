@@ -2,6 +2,7 @@ import BN from 'bn.js';
 import { ISAAC } from "../random/isaac";
 import { ec } from "elliptic";
 
+export namespace ECC {
 /**
  * Generate Random Number with Maximum Bound by CSPRNG
  * @param to The Maximum Number
@@ -42,3 +43,5 @@ export function randomPoint(curve: ec, seed: string | false = false) {
   const pair = randomKeyPair(curve, seed);
   return pair.getPublic();
 };
+
+}

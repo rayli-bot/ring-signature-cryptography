@@ -2,7 +2,7 @@ import { curve } from 'elliptic';
 import BN from 'bn.js';
 import { LinkableSignature, Scheme } from './interface';
 import * as Hash from 'js-sha512';
-import { random } from '../../util';
+import { ECC } from '../../util';
 
 /**
  * Linkable Ring Signature
@@ -47,7 +47,7 @@ export class LinkableRingSignature extends Scheme<LinkableSignature, LinkableSig
     const raw = new BN(Hash.sha512_256.digest(message));
 
     // Roughly Random a Random Number smaller than N
-    const u = random(N);
+    const u = ECC.random(N);
 
     // Get Secret Linkable Number
     const y = H.mul(secret);
@@ -73,7 +73,7 @@ export class LinkableRingSignature extends Scheme<LinkableSignature, LinkableSig
     for (let i = (position + 2) % this.members ; i !== (position + 1) % this.members ; i = (i + 1) % this.members) {
       // The Previous Index
       const j = (this.members + ((i-1) % this.members)) % this.members;
-      s[j] = random(N);
+      s[j] = ECC.random(N);
 
       // g^Sn
       const x1 = G.mul(s[j]);

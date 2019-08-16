@@ -1,5 +1,5 @@
 import * as Hash from "js-sha512";
-import { str2IntArray } from '../util';
+import { Bytes } from '../util';
 
 /**
  * 32-bit integer safe adder
@@ -74,7 +74,7 @@ export class ISAAC {
     a = b = c = d = e = f = g = h = 0x9e3779b9;
 
     if(s && typeof s === 'string') {
-      s = str2IntArray(s);
+      s = Bytes.str2IntArray(s);
     }
 
     if(s && typeof(s) === 'number') {

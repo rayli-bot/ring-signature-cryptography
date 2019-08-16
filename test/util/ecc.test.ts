@@ -1,4 +1,4 @@
-import { random, randomKeyPair, randomPoint } from '../../src';
+import { ECC } from '../../src';
 import 'mocha';
 import { expect } from 'chai';
 import { ec } from 'elliptic';
@@ -12,28 +12,28 @@ describe('Ring Signature Utility', () => {
 
   it('should generate same number from same seed', () => {
     for (let i = 0 ; i < iterator ; i++) {
-      expect(random(curve.n as any, seed).toString('hex'))
-        .equals(random(curve.n as any, seed).toString('hex'))
-        .not.equals(random(curve.n as any).toString("hex"))
-        .not.equals(random(curve.n as any, fake).toString('hex'));
+      expect(ECC.random(curve.n as any, seed).toString('hex'))
+        .equals(ECC.random(curve.n as any, seed).toString('hex'))
+        .not.equals(ECC.random(curve.n as any).toString("hex"))
+        .not.equals(ECC.random(curve.n as any, fake).toString('hex'));
     }
   }).timeout(10000);
 
   it('should generate same keypair from same seed', () => {
     for (let i = 0 ; i < iterator ; i++) {
-      expect(randomKeyPair(curve, seed).inspect())
-        .equals(randomKeyPair(curve, seed).inspect())
-        .not.equals(randomKeyPair(curve).inspect())
-        .not.equals(randomKeyPair(curve, fake).inspect());
+      expect(ECC.randomKeyPair(curve, seed).inspect())
+        .equals(ECC.randomKeyPair(curve, seed).inspect())
+        .not.equals(ECC.randomKeyPair(curve).inspect())
+        .not.equals(ECC.randomKeyPair(curve, fake).inspect());
     }
   }).timeout(10000);
 
   it('should generate same point from same seed', () => {
     for (let i = 0 ; i < iterator ; i++) {
-      expect(randomPoint(curve, seed).inspect())
-        .equals(randomPoint(curve, seed).inspect())
-        .not.equals(randomPoint(curve).inspect())
-        .not.equals(randomPoint(curve, fake).inspect());
+      expect(ECC.randomPoint(curve, seed).inspect())
+        .equals(ECC.randomPoint(curve, seed).inspect())
+        .not.equals(ECC.randomPoint(curve).inspect())
+        .not.equals(ECC.randomPoint(curve, fake).inspect());
     }
   }).timeout(10000);
 });
