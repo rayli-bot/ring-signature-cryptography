@@ -1,14 +1,14 @@
 {
   "name": "ring-signature",
-  "version": "0.0.1",
+  "version": "0.0.9",
   "description": "Ring Signature JS Toolkit",
   "main": "index.js",
   "scripts": {
     "clean": "rimraf dist",
-    "build": "npm run clean && ./node_modules/.bin/tsc --p . && cp package.json dist/package.json",
-    "lint": "./node_modules/.bin/tslint --fix -c tslint.json 'src/**/*.ts'",
+    "build": "npm run clean && tsc --p . && cp package.json dist/package.json",
+    "lint": "tslint --fix -c tslint.json 'src/**/*.ts'",
     "test": "mocha -r ts-node/register **/*.test.ts",
-    "publish": "npm run build && npm publish dist"
+    "upload": "npm run build && npm publish dist"
   },
   "keywords": [
     "RingSignature",
@@ -22,7 +22,6 @@
     "@types/chai": "^4.1.7",
     "@types/elliptic": "^6.4.9",
     "@types/mocha": "^5.2.7",
-    "@types/randombytes": "^2.0.0",
     "chai": "^4.2.0",
     "mocha": "^6.1.4",
     "nyc": "^14.1.1",
