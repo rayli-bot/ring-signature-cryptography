@@ -1,3 +1,5 @@
+import { Modulo } from "./modulo";
+
 export namespace Bytes {
 
   /**
@@ -53,7 +55,7 @@ export namespace Bytes {
    * Transfer Hex to Int Array
    * @param hex The String in Hex Format
    */
-  export function toByteArray(hex: string) {
+  export function hexToBytes(hex: string) {
     let result = [];
     for (var i = 0; i < hex.length; i += 2) {
       result.push(parseInt(hex.substr(i, 2), 16));
@@ -61,4 +63,46 @@ export namespace Bytes {
     return result;
   };
 
-}
+  /**
+   * Transfer String into Byte Array
+   * @param str The String Input
+   */
+  export function strToBytes(str: string) {
+    let result = [];
+    for (let i = 0 ; i < str.length ; i++)
+      result.push(str.charCodeAt(i));
+    return new Uint8Array(result);
+  };
+
+  /**
+   * Transfer Byte Array into String (UTF-8)
+   * @param bytes The Byte Array Input
+   */
+  export function bytesToStr(bytes: Uint8Array) {
+    let result = '';
+    for (let i = 0 ; i < bytes.length ; i++)
+      result += String.fromCharCode(bytes[i]);
+    return result;
+  };
+
+  /**
+   * Transfer Byte Array into Trinary Array
+   * @param bytes The Byte Array Input
+   */
+  export function bytesToTrits(bytes: Uint8Array) {
+    // Pad Zero(s) if bytes not divided by 3
+    let padding = Modulo.mod(bytes.length, 3);
+    // Padding Zeros to byte array
+    let pads = new Uint8Array(padding).fill(0);
+    bytes = concatBytes(bytes, pads);
+
+    // Start Transferring bytes to tinaries
+  };
+
+  export function concatBytes(a: Uint8Array, b: Uint8Array) { // a, b TypedArray of same type
+    var c = new Uint8Array(a.length + b.length);
+    c.set(a, 0);
+    c.set(b, a.length);
+    return c;
+  };
+};

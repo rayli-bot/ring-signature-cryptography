@@ -14,7 +14,7 @@ export class ALEA {
 
   constructor(args: string | number[] = []) {
 
-    if (typeof args === 'string') args = Bytes.toByteArray(Hash.sha512_256(args));
+    if (typeof args === 'string') args = Bytes.hexToBytes(Hash.sha512_256(args));
 
     if (args.length === 0) args = [+new Date()];
 
