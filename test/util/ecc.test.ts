@@ -3,7 +3,7 @@ import 'mocha';
 import { expect } from 'chai';
 import { ec } from 'elliptic';
 
-describe('Ring Signature Utility', () => {
+describe('Elliptic Curve Utility', () => {
 
   const iterator = 100;
   const seed = "i am seed 0";
