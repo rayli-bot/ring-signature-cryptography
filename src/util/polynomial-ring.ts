@@ -68,7 +68,7 @@ export class PolynomialRing {
         j++;
       }
     }
-    return out;
+    return p ? out.mod(p) : out;
   };
 
   /**
