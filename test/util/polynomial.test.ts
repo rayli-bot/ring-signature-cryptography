@@ -128,4 +128,26 @@ describe('Polynomial Utility', () => {
       expect(p).deep.equal(new Array(i).fill(i));
     }
   });
+
+  it('should compare to a single value of all coefficient', () => {
+    for (let i = 10 ; i < 100 ; i++) {
+      const a = new Polynomial(i, i - 1);
+      const b = new Polynomial(i, i);
+      const c = new Polynomial(i, i + 1);
+      expect(a.gt(i)).to.false;
+      expect(a.gte(i)).to.false;
+      expect(a.lt(i)).to.true;
+      expect(a.lte(i)).to.true;
+
+      expect(b.gt(i)).to.false;
+      expect(b.gte(i)).to.true;
+      expect(b.lt(i)).to.false;
+      expect(b.lte(i)).to.true;
+
+      expect(c.gt(i)).to.true;
+      expect(c.gte(i)).to.true;
+      expect(c.lt(i)).to.false;
+      expect(c.lte(i)).to.false;
+    }
+  });
 });
