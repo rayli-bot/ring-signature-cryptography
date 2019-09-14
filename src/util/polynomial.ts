@@ -198,4 +198,54 @@ export class Polynomial extends Array<number> {
 
     return this;
   };
+
+  /**
+   * Check whether all coefficient is greater than a value
+   * @param p The Coefficient Value
+   */
+  public gt(p: number) {
+    for (let i = 0 ; i < this.length ; i++)
+      if (this[i] <= p) return false;
+    return true;
+  };
+
+  /**
+   * Check whether all coefficient is greater than or equal to a value
+   * @param p The Coefficient Value
+   */
+  public gte(p: number) {
+    for (let i = 0 ; i < this.length ; i++)
+      if (this[i] < p) return false;
+    return true;
+  };
+
+  /**
+   * Check whether all coefficient is equal to a value
+   * @param p The Coefficient Value
+   */
+  public equal(p: number) {
+    for (let i = 0 ; i < this.length ; i++)
+      if (this[i] !== p) return false;
+    return true;
+  };
+
+  /**
+   * Check whether all coefficient is less than a value
+   * @param p The Coefficient Value
+   */
+  public lt(p: number) {
+    for (let i = 0 ; i < this.length ; i++)
+      if (this[i] >= p) return false;
+    return true;
+  }
+
+  /**
+   * Check whether all coefficient is less than or equal to a value
+   * @param p The Coefficient Value
+   */
+  public lte(p: number) {
+    for (let i = 0 ; i < this.length ; i++)
+      if (this[i] > p) return false;
+    return true;
+  }
 }
