@@ -86,17 +86,66 @@ export namespace Bytes {
   };
 
   /**
-   * Transfer Byte Array into Trinary Array
+   * Transfer Octets Array into Trinary Array
    * @param bytes The Byte Array Input
    */
   export function bytesToTrits(bytes: Uint8Array) {
-    // Pad Zero(s) if bytes not divided by 3
-    let padding = Modulo.mod(bytes.length, 3);
-    // Padding Zeros to byte array
-    let pads = new Uint8Array(padding).fill(0);
-    bytes = concatBytes(bytes, pads);
+    let trits = new Array<number>();
 
-    // Start Transferring bytes to tinaries
+    // Pad Zero(s) if bytes not divided by 3
+    const padding = Modulo.mod(bytes.length * 8, 3);
+    if (padding > 0) {
+      bytes = concatBytes(bytes, new Uint8Array(padding).fill(0));
+    }
+    // total numbmer of trits
+    let length = Math.floor(bytes.length * 8 / 3) * 2;
+
+    let counter = 0;
+
+    while (length >= 16) {
+      // get next three octets to bits
+      let octets = bytes.subarray(counter, counter + 3);
+      let bits24 = new Array<boolean>();
+      for (const octet of octets) {
+        for (let i = 7 ; i >= 0 ; i--) {
+          bits24.push(octet & (1 << i) ? true : false);
+        }
+      }
+
+      // Transform each 3-bits into 2 trits
+      while (bits24.length > 0) {
+        let bits3 = bits24.splice(0, 3);
+        // {0, 0, 0} -> {0, 0}
+        if (bits3[0] === false && bits3[1] === false && bits3[2] === false)
+          trits.push(0, 0);
+        // {0, 0, 1} -> {0, 1}
+        else if (bits3[0] === false && bits3[1] === false && bits3[2] === true)
+          trits.push(0, 1);
+        // {0, 1, 0} -> {0, -1}
+        else if (bits3[0] === false && bits3[1] === true && bits3[2] === false)
+          trits.push(0, -1);
+        // {0, 1, 1} -> {1, 0}
+        else if (bits3[0] === false && bits3[1] === true && bits3[2] === true)
+          trits.push(1, 0);
+        // {1, 0, 0} -> {1, 1}
+        else if (bits3[0] === true && bits3[1] === false && bits3[2] === false)
+          trits.push(1, 1);
+        // {1, 0, 1} -> {1, -1}
+        else if (bits3[0] === true && bits3[1] === false && bits3[2] === true)
+          trits.push(1, -1);
+        // {1, 1, 0} -> {-1, 0}
+        else if (bits3[0] === true && bits3[1] === true && bits3[2] === false)
+          trits.push(-1, 0);
+        // {1, 1, 1} -> {-1, 1}
+        else if (bits3[0] === true && bits3[1] === true && bits3[2] === true)
+          trits.push(-1, 1);
+      }
+
+      length -= 16;
+      counter += 3;
+    }
+    
+    return trits;
   };
 
   export function concatBytes(a: Uint8Array, b: Uint8Array) { // a, b TypedArray of same type
