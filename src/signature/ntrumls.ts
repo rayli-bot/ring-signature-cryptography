@@ -175,6 +175,7 @@ export class NTRUMLS {
 
     // f(1) : sp == s0 mod p
     // f(2) : t = h * s mod q
+    // Pack the Signature into a byte
     return s;
   }
 
@@ -190,10 +191,18 @@ export class NTRUMLS {
     const h = new Polynomial(pub);
     const s = new Polynomial(signature);
     const t = this.ring.mul(h, s, this.q);
+
+    const Hs = sha3_256(s);
+    const Hsp = sha3_256(challenge.sp);
+    const Hsmp = sha3_256(s.mod(this.p));
     
     const q2 = Math.floor(this.q / 2);
+    // Prevent Transcription distinguisable problem
     if (s.gt(q2-this.Bs) || t.gt(q2-this.Bt)) return false;
-    else if (sha3_256(s.mod(this.p)) !== sha3_256(challenge.sp)) return false;
+    // Not accepting the same value signature
+    else if (Hs === Hsp) return false;
+    // Reject invalid signature
+    else if (Hsmp !== Hsp) return false;
     else return true;
   }
 }

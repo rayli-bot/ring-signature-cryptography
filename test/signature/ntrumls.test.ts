@@ -2,6 +2,7 @@ import { NTRUMLS } from '../../src/signature/ntrumls';
 import 'mocha';
 import { expect } from 'chai';
 import { Bytes } from '../../src/util';
+import { sha3_256 } from 'js-sha3';
 
 describe('NTRUMLS', () => {
 
@@ -22,10 +23,11 @@ describe('NTRUMLS', () => {
     const ntru = new NTRUMLS({ N: 443, p: 3, q: 65536, d: 10, Bs: 138, Bt: 46 });
     const pair = ntru.create();
     const sign = ntru.sign(message, pair);
-    
-    const v1 = ntru.verify(message, sign, pair.pub);
-    expect(v1).to.true;
+    const challenge = ntru.challenge(message, pair.pub);
 
+    expect(ntru.verify(message, sign, pair.pub)).to.true;
+
+    expect(ntru.verify(message, challenge.sp, pair.pub)).to.false;
     expect(ntru.verify('foo-bar1', sign, pair.pub)).to.false;
     expect(ntru.verify('message', sign, pair.pub)).to.false;
 
@@ -33,4 +35,5 @@ describe('NTRUMLS', () => {
 
     expect(ntru.verify(message, sign, ntru.create().pub)).to.false;
   });
+
 });
