@@ -9,6 +9,11 @@ export interface KeyPair {
   pub: Array<number>;
 };
 
+export interface PrivateKey {
+  f: { neg: number[], pos: number[] };
+  g: { neg: number[], pos: number[] };
+};
+
 export interface Param {
   N: number;
   p: number;
@@ -18,10 +23,27 @@ export interface Param {
   Bt: number;
 };
 
-export interface Signature {
-  s: Array<number>;
-  t: Array<number>;
-};
+export namespace ParamSet {
+  export const bit82: Param = {
+    N: 401, p: 3, q: 32768, Bs: 138, Bt: 46, d: 8
+  };
+
+  export const bit88: Param = {
+    N: 443, p: 3, q: 65536, Bs: 138, Bt: 46, d: 9
+  };
+
+  export const bit126: Param = {
+    N: 563, p: 3, q: 65536, Bs: 174, Bt: 58, d: 10
+  };
+
+  export const bit179: Param = {
+    N: 743, p: 3, q: 131072, Bs: 186, Bt: 62, d: 11
+  };
+
+  export const bit269: Param = {
+    N: 907, p: 3, q: 131072, Bs: 225, Bt: 75, d: 13
+  };
+}
 
 export class NTRUMLS {
 
@@ -87,15 +109,78 @@ export class NTRUMLS {
 
     this.keypair = { priv: { f, g }, pub: h };
     return this.keypair;
+  };
+
+  /**
+   * Get Public Key
+   */
+  public getPublicKey() {
+    if (!this.keypair) throw 'Keypair Not Exist';
+    return this.keypair.pub;
+  };
+
+  public getPrivateKey() {
+    if (!this.keypair) throw 'Keypair Not Exist';
+    return this.keypair.priv;
   }
 
-  public export(): KeyPair {
-    if (this.keypair) return this.keypair;
-    else throw 'Keypair Not Exist';
+  /**
+   * Export the Private Key
+   * Export a json describe where is -1, +1 in f and g
+   */
+  public export(): PrivateKey {
+    if (!this.keypair) throw 'Keypair Not Exist';
+
+    let output: PrivateKey = {
+      f: { neg: [], pos: []},
+      g: { neg: [], pos: [] },
+    };
+    const f = this.keypair.priv.f;
+    const g = this.keypair.priv.g;
+    
+    if (f.length !== g.length) throw 'Keypair private key length not correct';
+
+    for (let i = 0 ; i < f.length ; i++) {
+      if (f[i] === 1) output.f.pos.push(i);
+      else if (f[i] === -1) output.f.neg.push(i);
+
+      if (g[i] === 1) output.g.pos.push(i);
+      else if (g[i] === -1) output.g.neg.push(i);
+    }
+
+    return output;
   }
 
-  public import(keypair: KeyPair) {
-    this.keypair = keypair;
+  public import(keypair: PrivateKey | KeyPair) {
+    if (!keypair) throw 'invalid keypair';
+
+    const isKeypair = (pair: any): pair is KeyPair => {
+      return pair.priv && pair.pub;
+    };
+
+    const isPrivateKey = (pair: any): pair is PrivateKey => {
+      return pair.f && pair.g;
+    };
+
+    if (isKeypair(keypair)) this.keypair = keypair;
+    else if (isPrivateKey(keypair)) {
+
+      let f = new Polynomial(this.N);
+      let g = new Polynomial(this.N);
+
+      // Recover f & g from neg & pos index
+      for (let i of keypair.f.neg) f[i] = -1;
+      for (let i of keypair.f.pos) f[i] = 1;
+      for (let i of keypair.g.neg) g[i] = -1;
+      for (let i of keypair.g.pos) g[i] = 1;
+
+      const fq = this.ring.inv(f, this.q);
+      const h1 = this.ring.mul(new Polynomial([this.p]), fq, this.q);
+      // h = p * fq * g
+      const h = this.ring.mul(h1, g, this.q);
+
+      this.keypair = { priv: { f, g }, pub: h };
+    }
   }
 
   /*
