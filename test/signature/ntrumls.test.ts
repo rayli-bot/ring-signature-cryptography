@@ -49,13 +49,10 @@ describe('NTRUMLS', () => {
 
     expect(ntru.verify(message, sign, pair.pub)).to.true;
 
-    expect(ntru.verify(message, challenge.sp, pair.pub)).to.false;
+    expect(ntru.verify(message, new Uint32Array(challenge.sp).buffer, pair.pub)).to.false;
     expect(ntru.verify('foo-bar1', sign, pair.pub)).to.false;
     expect(ntru.verify('message', sign, pair.pub)).to.false;
 
-    expect(ntru.verify(message, sign.concat(...[-1,0,0]), pair.pub)).to.false;
-
     expect(ntru.verify(message, sign, ntru.create().pub)).to.false;
   }).timeout(10000);
-
 });

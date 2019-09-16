@@ -220,7 +220,7 @@ export class NTRUMLS {
    * @param msg The Message for Signing
    * @param pair The Keypair for Signing
    */
-  public sign(msg: string, pair: KeyPair): number[] {
+  public sign(msg: string, pair: KeyPair): ArrayBuffer {
     const q2 = Math.floor(this.q / 2);
 
     const f = new Polynomial(pair.priv.f);
@@ -261,7 +261,7 @@ export class NTRUMLS {
     // f(1) : sp == s0 mod p
     // f(2) : t = h * s mod q
     // Pack the Signature into a byte
-    return s;
+    return new Uint32Array(s).buffer;
   }
 
   /**
@@ -270,11 +270,14 @@ export class NTRUMLS {
    * @param signature The Signature of the Message
    * @param pub The Public key for verification
    */
-  public verify(msg: string, signature: number[], pub: number[]) {
+  public verify(msg: string, signature: ArrayBuffer, pub: number[]) {
+    const unpacked = new Uint32Array(signature);
+    const origin = Array.from(unpacked);
+
     const challenge = this.challenge(msg, pub);
 
     const h = new Polynomial(pub);
-    const s = new Polynomial(signature);
+    const s = new Polynomial(origin);
     const t = this.ring.mul(h, s, this.q);
 
     const Hs = sha3_256(s);
