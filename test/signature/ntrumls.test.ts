@@ -29,13 +29,13 @@ describe('NTRUMLS', () => {
     const n3 = new NTRUMLS(ParamSet.bit126);
     n3.import(pair);
 
-    expect(sha3_256(JSON.stringify(n1.getPrivateKey())))
-      .equals(sha3_256(JSON.stringify(n2.getPrivateKey())))
-      .equals(sha3_256(JSON.stringify(n3.getPrivateKey())))
+    expect(sha3_256(JSON.stringify(n1.priv())))
+      .equals(sha3_256(JSON.stringify(n2.priv())))
+      .equals(sha3_256(JSON.stringify(n3.priv())))
 
-    expect(sha3_256(JSON.stringify(n1.getPublicKey())))
-      .equals(sha3_256(JSON.stringify(n2.getPublicKey())))
-      .equals(sha3_256(JSON.stringify(n3.getPublicKey())))
+    expect(sha3_256(JSON.stringify(n1.pub())))
+      .equals(sha3_256(JSON.stringify(n2.pub())))
+      .equals(sha3_256(JSON.stringify(n3.pub())))
   });
 
   it('should sign correctly', () => {
@@ -43,7 +43,7 @@ describe('NTRUMLS', () => {
     const ntru = new NTRUMLS(ParamSet.bit126);
     const pair = ntru.create();
 
-    const pubKey = ntru.getPackedPubKey();
+    const pubKey = ntru.pub(true);
 
     const sign = ntru.sign(message, pair);
     const challenge = ntru.challenge(message, pair.pub);

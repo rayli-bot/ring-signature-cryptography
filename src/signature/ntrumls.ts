@@ -10,8 +10,8 @@ export interface KeyPair {
 };
 
 export interface PrivateKey {
-  f: { neg: number[], pos: number[] };
-  g: { neg: number[], pos: number[] };
+  f: { neg: Array<number>, pos: Array<number> };
+  g: { neg: Array<number>, pos: Array<number> };
 };
 
 export interface Param {
@@ -69,8 +69,8 @@ export class NTRUMLS {
 
   /**
    * Generate Psuedo-Random Small Polynomial with [-1, 0, 1].
-   * @param pos The Number of Positive 1's.
-   * @param neg The Number of Negative 1's.
+   * @param pos The number of Positive 1's.
+   * @param neg The number of Negative 1's.
    * @param len The Coefficient Length of the Polynomial
    */
   private randomPoly(pos: number, neg: number, len: number) {
@@ -114,12 +114,15 @@ export class NTRUMLS {
   /**
    * Get Public Key
    */
-  public getPublicKey() {
+  public pub(pack?: true): ArrayBuffer;
+  public pub(pack?: false): Array<number>;
+  public pub(pack: boolean = false): ArrayBuffer | Array<number> {
     if (!this.keypair) throw 'Keypair Not Exist';
-    return this.keypair.pub;
+    if (pack) return this.pack(this.keypair.pub)
+    else return this.keypair.pub;
   };
 
-  public getPrivateKey() {
+  public priv() {
     if (!this.keypair) throw 'Keypair Not Exist';
     return this.keypair.priv;
   }
@@ -183,24 +186,34 @@ export class NTRUMLS {
     }
   }
 
-  /*
-  public encrypt(msg: string, pub: string) {
-    // Encode Message from string to binary
-    // Unpack Public Key
-    // P(r): (d) 1's && (d) -1's
-    const r = this.randomPoly(this.d, this.d, this.N);
-    const e1 = this.ring.mul(r, h, params.q);
-    const e = this.ring.add(e1, m, params.q);
-    return e;
+  /**
+   * Pack the Polynomial / number Array into Buffer
+   * @param data The number Array / Polynomial
+   */
+  public pack(data: Array<number>): ArrayBuffer {
+    const bits = Math.log2(this.q);
+    if (bits >= 32) return new Uint32Array(data).buffer
+    else if (bits >= 16) return new Uint16Array(data).buffer
+    else return new Uint8Array(data).buffer
   }
-  */
+
+  /**
+   * Unpack Buffer to Typed Array
+   * @param buf The Array Buffer
+   */
+  public unpack(buf: ArrayBuffer) {
+    const bits = Math.log2(this.q);
+    if (bits >= 32) return new Uint32Array(buf)
+    else if (bits >= 16) return new Uint16Array(buf)
+    else return new Uint8Array(buf)
+  }
 
   /**
    * Get the Original Challenge for the Signature
    * @param msg The Message for Signing
    * @param pub The Signer's Public Key
    */
-  public challenge(msg: string, pub: number[]) {
+  public challenge(msg: string, pub: Array<number>) {
     const h = new Polynomial(pub);
     // Pool = H (H(msg) | H(pub))
     const pool = sha3_256.digest(sha3_256.digest(msg).concat(sha3_256.digest(pub)));
@@ -261,7 +274,7 @@ export class NTRUMLS {
     // f(1) : sp == s0 mod p
     // f(2) : t = h * s mod q
     // Pack the Signature into a byte
-    return new Uint32Array(s).buffer;
+    return this.pack(s);
   }
 
   /**
@@ -270,8 +283,8 @@ export class NTRUMLS {
    * @param signature The Signature of the Message
    * @param pub The Public key for verification
    */
-  public verify(msg: string, signature: ArrayBuffer, pub: number[]) {
-    const unpacked = new Uint32Array(signature);
+  public verify(msg: string, signature: ArrayBuffer, pub: Array<number>) {
+    const unpacked = this.unpack(signature);
     const origin = Array.from(unpacked);
 
     const challenge = this.challenge(msg, pub);
