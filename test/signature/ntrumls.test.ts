@@ -1,7 +1,7 @@
 import { NTRUMLS, ParamSet } from '../../src/signature/ntrumls';
 import 'mocha';
 import { expect } from 'chai';
-import { Bytes } from '../../src/util';
+import { Bytes, Polynomial } from '../../src/util';
 import { sha3_256 } from 'js-sha3';
 
 describe('NTRUMLS', () => {
@@ -36,7 +36,6 @@ describe('NTRUMLS', () => {
     expect(sha3_256(JSON.stringify(n1.getPublicKey())))
       .equals(sha3_256(JSON.stringify(n2.getPublicKey())))
       .equals(sha3_256(JSON.stringify(n3.getPublicKey())))
-
   });
 
   it('should sign correctly', () => {
@@ -44,8 +43,13 @@ describe('NTRUMLS', () => {
     const ntru = new NTRUMLS(ParamSet.bit126);
     const pair = ntru.create();
 
+    const pubKey = ntru.getPackedPubKey();
+
     const sign = ntru.sign(message, pair);
     const challenge = ntru.challenge(message, pair.pub);
+
+    // Should Get the Same Byte Length everytime
+    expect(pubKey.byteLength).equals(sign.byteLength).equals(1126);
 
     expect(ntru.verify(message, sign, pair.pub)).to.true;
 
@@ -55,4 +59,38 @@ describe('NTRUMLS', () => {
 
     expect(ntru.verify(message, sign, ntru.create().pub)).to.false;
   }).timeout(10000);
+
+  it('should benchmark NTRUMLS scheme performance', async (done) => {
+    const rounds = 10;
+    const message = 'foo-bar';
+
+    let ntru = new NTRUMLS(ParamSet.bit126);
+
+    console.time("Setup for "+rounds+" times")
+    for (let i = 0 ; i < rounds ; i++) {
+      ntru = new NTRUMLS(ParamSet.bit126);
+      ntru.create();
+    }
+    console.timeEnd("Setup for "+rounds+" times")
+
+    let pair = ntru.create();
+    console.time("Sign for "+rounds+" times")
+    for (let i = 0 ; i < rounds ; i++) {
+      ntru.sign(message, pair);
+    }
+    console.timeEnd("Sign for "+rounds+" times")
+
+    let signs = [];
+    for (let i = 0 ; i < rounds ; i++) {
+      signs.push(ntru.sign(message, pair));
+    }
+
+    console.time("Verify for "+rounds+" times")
+    for (let i = 0 ; i < rounds ; i++) {
+      ntru.verify(message, signs[i], pair.pub);
+    }
+    console.timeEnd("Verify for "+rounds+" times")
+
+    done();
+  }).timeout(100000);
 });
