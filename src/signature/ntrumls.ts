@@ -10,38 +10,40 @@ export interface KeyPair {
 };
 
 export interface PrivateKey {
-  f: { neg: Array<number>, pos: Array<number> };
-  g: { neg: Array<number>, pos: Array<number> };
+  f: { [key: string]: Array<number> };
+  g: { [key: string]: Array<number> };
 };
 
 export interface Param {
   N: number;
   p: number;
   q: number;
-  d: number;
+  d1: number;
+  d2: number;
+  d3: number;
   Bs: number;
   Bt: number;
 };
 
 export namespace ParamSet {
   export const bit82: Param = {
-    N: 401, p: 3, q: 32768, Bs: 138, Bt: 46, d: 8
+    N: 401, p: 3, q: 32768, Bs: 138, Bt: 46, d1: 8, d2: 8, d3: 6
   };
 
   export const bit88: Param = {
-    N: 443, p: 3, q: 65536, Bs: 138, Bt: 46, d: 9
+    N: 443, p: 3, q: 65536, Bs: 138, Bt: 46, d1: 9, d2: 8, d3: 5
   };
 
   export const bit126: Param = {
-    N: 563, p: 3, q: 65536, Bs: 174, Bt: 58, d: 10
+    N: 563, p: 3, q: 65536, Bs: 174, Bt: 58, d1: 10, d2: 9, d3: 8
   };
 
   export const bit179: Param = {
-    N: 743, p: 3, q: 131072, Bs: 186, Bt: 62, d: 11
+    N: 743, p: 3, q: 131072, Bs: 186, Bt: 62, d1: 11, d2: 11, d3: 6
   };
 
   export const bit269: Param = {
-    N: 907, p: 3, q: 131072, Bs: 225, Bt: 75, d: 13
+    N: 907, p: 3, q: 131072, Bs: 225, Bt: 75, d1: 13, d2: 12, d3: 7
   };
 }
 
@@ -50,7 +52,7 @@ export class NTRUMLS {
   public N: number;
   public p: number;
   public q: number;
-  public d: number;
+  public d1: number; public d2: number; public d3: number;
   public Bs: number;
   public Bt: number;
   public ring: PolynomialRing;
@@ -59,7 +61,8 @@ export class NTRUMLS {
   private keypair?: KeyPair;
 
   constructor(param: Param, seed?: string) {
-    this.N = param.N; this.p = param.p; this.q = param.q; this.d = param.d;
+    this.N = param.N; this.p = param.p; this.q = param.q;
+    this.d1 = param.d1; this.d2 = param.d2; this.d3 = param.d3;
     this.Bs = param.Bs; this.Bt = param.Bt;
     // Ring = x^N - 1
     this.ring = new PolynomialRing(this.N);
@@ -96,12 +99,27 @@ export class NTRUMLS {
    * Generate KeyPair
    */
   public create(): KeyPair {
-    // P(f): (d+1) 1's && (d) -1's && f^-1 mod p && f^-1 mod q
+    // Fi = (d) 1's && d -1's
+    // const F1 = this.randomPoly(this.d1, this.d1, this.N);
+    // const F2 = this.randomPoly(this.d2, this.d2, this.N);
+    // const F3 = this.randomPoly(this.d3, this.d3, this.N);
+    // P(f): p(F1 * F2 + F3 + 1)
     // the max. coefficient is x^(N-1)
     // this should have invertiable in x^N - 1 IFF P(f) < x^N - 1
-    const f = this.randomPoly(this.d + 1, this.d, this.N);
+    // this.ring.add(this.ring.add(this.ring.mul(F1, F2, this.p), F3, this.p), new Polynomial([1]), this.p);
+
+    // P(f): (d+1) 1's && (d) -1's && f^-1 mod p && f^-1 mod q
+    const f = this.randomPoly(this.d1 + 1, this.d1, this.N);
+
+    // Gi = (d) 1's && d -1's
+    // const G1 = this.randomPoly(this.d1, this.d1, this.N);
+    // const G2 = this.randomPoly(this.d2, this.d2, this.N);
+    // const G3 = this.randomPoly(this.d3, this.d3, this.N);
+    // P(g): G1 * G2 + G3 + 1
+    // const g = this.ring.add(this.ring.add(this.ring.mul(G1, G2, this.p), G3, this.p), new Polynomial([1]), this.p);
+
     // P(g): (d) 1's && (d) -1's
-    const g = this.randomPoly(this.d, this.d, this.N);
+    const g = this.randomPoly(this.d1, this.d1, this.N);
     const fq = this.ring.inv(f, this.q);
     const h1 = this.ring.mul(new Polynomial([this.p]), fq, this.q);
     // h = p * fq * g
@@ -134,21 +152,22 @@ export class NTRUMLS {
   public export(): PrivateKey {
     if (!this.keypair) throw 'Keypair Not Exist';
 
-    let output: PrivateKey = {
-      f: { neg: [], pos: []},
-      g: { neg: [], pos: [] },
-    };
+    let output: PrivateKey = {f: { }, g: { }};
     const f = this.keypair.priv.f;
     const g = this.keypair.priv.g;
     
     if (f.length !== g.length) throw 'Keypair private key length not correct';
 
     for (let i = 0 ; i < f.length ; i++) {
-      if (f[i] === 1) output.f.pos.push(i);
-      else if (f[i] === -1) output.f.neg.push(i);
+      if (f[i] !== 0) {
+        if (!output.f[f[i].toString()]) output.f[f[i].toString()] = [];
+        output.f[f[i].toString()].push(i);
+      }
 
-      if (g[i] === 1) output.g.pos.push(i);
-      else if (g[i] === -1) output.g.neg.push(i);
+      if (g[i] !== 0) {
+        if (!output.g[g[i].toString()]) output.g[g[i].toString()] = [];
+        output.g[g[i].toString()].push(i);
+      }
     }
 
     return output;
@@ -172,10 +191,16 @@ export class NTRUMLS {
       let g = new Polynomial(this.N);
 
       // Recover f & g from neg & pos index
-      for (let i of keypair.f.neg) f[i] = -1;
-      for (let i of keypair.f.pos) f[i] = 1;
-      for (let i of keypair.g.neg) g[i] = -1;
-      for (let i of keypair.g.pos) g[i] = 1;
+      for (const v in keypair.f) {
+        for (let i = 0 ; i < keypair.f[v].length ; i++) {
+          f[keypair.f[v][i]] = Number(v);
+        }
+      }
+      for (const v in keypair.g) {
+        for (let i = 0 ; i < keypair.g[v].length ; i++) {
+          g[keypair.g[v][i]] = Number(v);
+        }
+      }
 
       const fq = this.ring.inv(f, this.q);
       const h1 = this.ring.mul(new Polynomial([this.p]), fq, this.q);
