@@ -76,7 +76,7 @@ export class NTRUMLS {
    * @param neg The number of Negative 1's.
    * @param len The Coefficient Length of the Polynomial
    */
-  private randomPoly(pos: number, neg: number, len: number) {
+  public randomPoly(pos: number, neg: number, len: number) {
     let x = new Polynomial(len);
     let state = Array.from({length: len}, (v,i) => i);
     // choose +1 in P(x)
@@ -106,7 +106,7 @@ export class NTRUMLS {
     // P(f): p(F1 * F2 + F3 + 1)
     // the max. coefficient is x^(N-1)
     // this should have invertiable in x^N - 1 IFF P(f) < x^N - 1
-    // this.ring.add(this.ring.add(this.ring.mul(F1, F2, this.p), F3, this.p), new Polynomial([1]), this.p);
+    // const f = this.ring.add(this.ring.add(this.ring.mul(F1, F2, this.p), F3, this.p), new Polynomial([1]), this.p);
 
     // P(f): (d+1) 1's && (d) -1's && f^-1 mod p && f^-1 mod q
     const f = this.randomPoly(this.d1 + 1, this.d1, this.N);
