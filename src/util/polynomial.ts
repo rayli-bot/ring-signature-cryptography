@@ -63,6 +63,7 @@ export class Polynomial extends Array<number> {
    * @param debug Will return all coefficient even zeros.
    */
   public toString(debug = false) {
+    if (!debug) return this.join(',');
     let tmp = [];
     for (let i = this.length - 1 ; i >= 0 ; i--) {
       if (this[i] != 0 || debug) {
